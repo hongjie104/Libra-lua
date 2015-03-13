@@ -9,10 +9,10 @@ local function createScale9Sprite(img, size, capInsets)
 	return s
 end
 
-local Label = require("libra.ui.JLabel")
+local Label = require("libra.ui.components.JLabel")
 
 local JButton = class("JButton", function (param)
-	assert(param.normal, "JButton:class() - invalid param")
+	assert(param.normal, "JButton:class() - invalid param:param.normal is nil")
 	if param.scale9 then
 		return display.newNode()
 	else
@@ -21,7 +21,7 @@ local JButton = class("JButton", function (param)
 end)
 
 --- 构造函数
--- @param param {normmal = "按钮正常状态时图片", down = "按钮按下状态图片", enabled = "按钮不可用状态图片",  label = {text = "按钮文字", size = 24}}
+-- @param param {normmal = "按钮正常状态时图片", down = "按钮按下状态图片", unabled = "按钮不可用状态图片",  label = {text = "按钮文字", size = 24}}
 -- scale9 = ccsize 如果有值,说明是九宫图, capInsets = CCRect,
 -- @param functions {onTouchBegan = 按下时的回调, onTouchMoved = 触摸移动时的回调, onTouchEnded = 触摸结束时的回调}
 function JButton:ctor(param, functions)
@@ -31,16 +31,15 @@ function JButton:ctor(param, functions)
 
 	if param.scale9 then
 		self._scale9 = createScale9Sprite(param.normal, param.scale9, param.capInsets):addTo(self)
-		dump(self._scale9:getAnchorPoint())
 		self:actualWidth(param.scale9.width)
 		self:actualHeight(param.scale9.Height)
 	end
 
 	if self._param.label then
 		if param.scale9 then
-			Label.new(self._param.label):addTo(self):align(display.CENTER, 0, self._actualHeight / 2)
+			self._label = Label.new(self._param.label):addTo(self):align(display.CENTER, 0, self._actualHeight / 2)
 		else
-			Label.new(self._param.label):addTo(self):align(display.CENTER, self._actualWidth / 2, self._actualHeight / 2)
+			self._label = Label.new(self._param.label):addTo(self):align(display.CENTER, self._actualWidth / 2, self._actualHeight / 2)
 		end
 	end
 
@@ -53,12 +52,12 @@ function JButton:enabled(bool)
 		if self._enabled ~= bool then
 			self._enabled = bool
 		end
-		if self._param.enabled then
+		if self._param.unabled then
 			if self._scale9 then
 				self._scale9:removeSelf()
 				self._scale9 = createScale9Sprite(self._param.normal, self._param.scale9, self._param.capInsets):addTo(self)
 			else
-				self:setTexture(self._enabled and self._param.normal or self._param.enabled)
+				self:setTexture(self._enabled and self._param.normal or self._param.unabled)
 			end
 		end
 		self:setTouchEnabled(self._enabled)
@@ -68,7 +67,18 @@ function JButton:enabled(bool)
 end
 
 function JButton:checkTouchIn(x, y)
-    return self:getCascadeBoundingBox():containsPoint(cc.p(x, y))
+    return 
+end
+
+function JButton:doClick()
+	self:onTouchEnded()
+end
+
+function JButton:alignLabel(align, x, y)
+	if self._label then
+		self._label:alignLabel(align, x, y)
+	end
+	return self
 end
 
 function JButton:onTouch(evt)
@@ -81,7 +91,7 @@ function JButton:onTouch(evt)
 				self:setTexture(self._param.down)
 			end
 		else
-			self:scale(1.1)
+			self:scale(.9)
 		end
 		self:onTouchBegan(evt)
 		return true
@@ -98,7 +108,7 @@ function JButton:onTouch(evt)
 		else
 			self:scale(1)
 		end
-		if self:checkTouchIn(evt.x, evt.y) then
+		if self:isPointIn(evt.x, evt.y) then
 			self:onTouchEnded(evt)
 		end
 	end
