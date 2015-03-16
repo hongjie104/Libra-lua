@@ -5,6 +5,7 @@ local CheckBox = require("libra.ui.components.JCheckBox")
 local CheckBoxGroup = require("libra.ui.components.JCheckBoxGroup")
 local Panel = require("libra.ui.components.JPanel")
 local CountDown = require("libra.ui.components.JCountDown")
+local JAlert = require("libra.ui.components.JAlert")
 
 local MainScene = class("MainScene", function()
     return display.newScene("MainScene")
@@ -27,8 +28,8 @@ function MainScene:ctor()
             -- else
             --     self._countDown:resume()
             -- end
-            -- print("ended")
-        end}):addToContainer():align(display.CENTER, display.cx, display.cy)
+            print("Button ended")
+        end}):addToContainer():align(display.CENTER, display.width, display.cy)
 
 	-- logger:debug("fsdfdsfsd")
 
@@ -43,7 +44,11 @@ function MainScene:ctor()
     -- checkBoxGroup:setSize(200, 200)
     -- checkBoxGroup:updateLayout()
 
-    -- Panel.new():show()
+    -- Panel.new({bg = "imgIcoBg30.png", isScale9 = true}):setSize(200, 200):align(display.CENTER, display.cx, display.cy):show()
+
+    JAlert.new({bg = "imgIcoBg30.png", isScale9 = true}):setSize(300, 200):align(display.CENTER, display.cx, display.cy):show(true, true, function (isOK)
+        print(isOK)
+    end)
 
     -- self._countDown = CountDown.new({text = "Hello, World", size = 24}, function ()
     --     print("11111111111")

@@ -27,6 +27,22 @@ local function name(self, str)
 	return self._name
 end
 
+local function showBorder(self)
+	if self._border then
+		self._border:setVisible(true)
+	else
+		self._border = display.newRect(cc.rect(self._actualWidth / -2, self._actualHeight / -2, self._actualWidth, self._actualHeight), 
+			{borderColor = cc.c4f(0,1,0,1)}):addTo(self)
+	end
+	return self
+end
+
+local function closeBorder(self)
+	if self._border then
+		self._border:setVisible(false)
+	end
+end
+
 local function addToContainer(self, container)
 	local container = container or libraUIManager:getUIContainer()
 	assert(container.isContainer, "libra.ui.init.addToContainer() - invalid container")
@@ -40,13 +56,6 @@ end
 function makeUIComponent(component)
     component:setCascadeOpacityEnabled(true)
     component:setCascadeColorEnabled(true)
-    -- component:addNodeEventListener(cc.NODE_EVENT, function(event)
-    --     if event.name == "cleanup" then
-    --         component:removeAllEventListeners()
-    --     end
-    -- end)
-
-    component.addToContainer = addToContainer
 
     component._actualWidth, component._actualHeight = 0, 0
     component.actualWidth = actualWidth
@@ -58,6 +67,10 @@ function makeUIComponent(component)
 
 	component._name = ''
     component.name = name
+
+    component.showBorder = showBorder
+    component.closeBorder = closeBorder
+    component.addToContainer = addToContainer
 end
 
 -- Direction = {

@@ -7,18 +7,29 @@ local JContainer = class("JContainer", function ()
 	return display.newNode()
 end)
 
-function JContainer:ctor()
+-- @param param {bg="背景图", isScale9 = true}
+function JContainer:ctor(param)
+	self._param = param
 	makeUIComponent(self)
 	self._componentList = {}
 end
 
 function JContainer:setSize(width, height)
 	self:actualWidth(width):actualHeight(height)
-	if self._bg then
-		self._bg:setContentSize(cc.size(width, height))
-	else
-		self._bg = display.newScale9Sprite("imgIcoBg30.png", 0, 0, cc.size(width, height)):addTo(self, -1)
+	if self._param.bg then
+		if self._bg then
+			if self._param.isScale9 then
+				self._bg:setContentSize(cc.size(width, height))
+			end
+		else
+			if self._param.isScale9 then
+				self._bg = display.newScale9Sprite(self._param.bg, 0, 0, cc.size(width, height)):addTo(self, -1)
+			else
+				display.newSprite(self._param.bg):addTo(self, -1)
+			end
+		end
 	end
+	return self
 end
 
 function JContainer:getSize()
@@ -42,6 +53,11 @@ function JContainer:getComponent(name)
 			if v:name() == name then return v end
 		end
 	end
+end
+
+function JContainer:clearComponents()
+	self:removeAllChildren()
+	self._componentList = {}
 end
 
 function JContainer:updateLayout()
