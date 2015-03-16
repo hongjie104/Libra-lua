@@ -40,11 +40,11 @@ end
 function makeUIComponent(component)
     component:setCascadeOpacityEnabled(true)
     component:setCascadeColorEnabled(true)
-    component:addNodeEventListener(cc.NODE_EVENT, function(event)
-        if event.name == "cleanup" then
-            component:removeAllEventListeners()
-        end
-    end)
+    -- component:addNodeEventListener(cc.NODE_EVENT, function(event)
+    --     if event.name == "cleanup" then
+    --         component:removeAllEventListeners()
+    --     end
+    -- end)
 
     component.addToContainer = addToContainer
 

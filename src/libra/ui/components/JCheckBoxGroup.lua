@@ -6,8 +6,9 @@
 local JCheckBoxGroup = class("JCheckBoxGroup", require("libra.ui.components.JContainer"))
 
 -- @param isHorizontal 是不是水平排列,默认是水平的
-function JCheckBoxGroup:ctor(isHorizontal, gap)
+function JCheckBoxGroup:ctor(onSelectedChanged, isHorizontal, gap)
 	JCheckBoxGroup.super.ctor(self)
+	self._onSelectedChanged = onSelectedChanged
 
 	self._checkBoxList = {}
 	self:setLayout(require("libra.ui.layout.BoxLayout").new(self._checkBoxList, isHorizontal, gap))
@@ -18,8 +19,17 @@ end
 function JCheckBoxGroup:selectedCheckBox(val)
 	if val then
 		self._selectedCheckBox = val
-		for _, v in ipairs(self._checkBoxList) do
-			v:selected(v == self._selectedCheckBox, false)
+		index = -1
+		for i, v in ipairs(self._checkBoxList) do
+			if v == self._selectedCheckBox then
+				v:selected(true, false, true)
+				index = i
+			else
+				v:selected(false, false, true)
+			end
+		end
+		if self._onSelectedChanged and type(self._onSelectedChanged) == "function" then
+			self._onSelectedChanged(index)
 		end
 		return self
 	end

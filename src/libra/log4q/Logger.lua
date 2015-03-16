@@ -5,10 +5,6 @@
 
 local Logger = class("Logger")
 
-function Logger:ctor()
-	-- body
-end
-
 function Logger:debug(...)
     if LOG_LEVEL.DEBUG then
         local info = "[DEBUG]:"

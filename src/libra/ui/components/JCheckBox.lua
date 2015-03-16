@@ -64,10 +64,10 @@ function JCheckBox:enabled(bool)
 	return self._enabled
 end
 
-function JCheckBox:selected(bool, callback)
+function JCheckBox:selected(bool, callback, passive)
 	if type(bool) == "boolean" then
 		if self._selected ~= bool then
-			if not self._group or not self._selected then
+			if not self._group or not self._selected or passive then
 				self._selected = bool
 				if self._selected then
 					if self._group then

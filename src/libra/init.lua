@@ -5,8 +5,14 @@
 
 import(".ui.init")
 import(".log4q.init")
+if LUA_UPDATE then 
+	-- 在win平台,才开启代码热更新机制
+	if device.platform == "windows" then
+		import(".luaUpdate.init")
+	end
+end
 
-logger = require("libra.log4q.Logger")
+logger = import(".log4q.Logger")
 
 local Node = cc.Node
 
