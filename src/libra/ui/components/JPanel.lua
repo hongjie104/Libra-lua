@@ -19,6 +19,7 @@ function JPanel:show()
 		self:addToContainer()
 		self._isShowing = true
 	end
+	return self
 end
 
 function JPanel:close()
@@ -26,6 +27,7 @@ function JPanel:close()
 		self._isShowing = false
 		self:removeSelf()
 	end
+	return self
 end
 
 function JPanel:isShowing()

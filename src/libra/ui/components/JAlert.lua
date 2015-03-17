@@ -16,11 +16,11 @@ function JAlert:show(isShowOK, isShowCancel, onClicked)
 	self._onClicked = onClicked
 	if isShowOK then
 		self._okBtn = JButton.new({label = {text = "ok"}, normal = "btnRed2_normal.png", down = "btnRed2_down.png"}, 
-			{onTouchEnded = handler(self, self.onOKClicked)}):addTo(self)
+			handler(self, self.onOKClicked)):addTo(self)
 	end
 	if isShowCancel then
 		self._cancelBtn = JButton.new({label = {text = "cancel"}, normal = "btnRed2_normal.png", down = "btnRed2_down.png"}, 
-			{onTouchEnded = handler(self, self.onCancelClicked)}):addTo(self)
+			handler(self, self.onCancelClicked)):addTo(self)
 	end
 	if self._okBtn and self._cancelBtn then
 		self._okBtn:align(display.CENTER_BOTTOM, self._okBtn:actualWidth() / -2, self._actualHeight / -2)
@@ -30,23 +30,24 @@ function JAlert:show(isShowOK, isShowCancel, onClicked)
 	elseif self._cancelBtn then
 		self._cancelBtn:align(display.CENTER_BOTTOM, 0, self._actualHeight / -2)
 	end
-	JAlert.super.show(self)
+	return JAlert.super.show(self)
+end
+
+function JAlert:close(isOKBtnClicked)
+	if self._onClicked then
+		if type(self._onClicked) == "function" then
+			self._onClicked(isOKBtnClicked)
+		end
+	end
+	return JAlert.super.close(self)
 end
 
 function JAlert:onOKClicked()
-	if self._onClicked then
-		if type(self._onClicked) == "function" then
-			self._onClicked(true)
-		end
-	end
+	self:close(true)
 end
 
 function JAlert:onCancelClicked()
-	if self._onClicked then
-		if type(self._onClicked) == "function" then
-			self._onClicked(false)
-		end
-	end
+	self:close(false)
 end
 
 return JAlert

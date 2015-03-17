@@ -20,16 +20,14 @@ function MainScene:ctor()
     Button.new({normal = "btnRed2_normal.png", down1 = "btnRed2_down.png", 
         label = {text = "hello world!", size = 24}},
     -- Button.new({normal = "imgIcoBg30.png", scale9 = cc.size(60, 60), label = {text = "Hello, World", size = 24}},
-    	{onTouchBegan = function (evt)
-    		-- print("began")
-    	end, onTouchEnded = function ()
+        function ()
+            print("button is clicked")
             -- if self._countDown:isRunning() then
             --     self._countDown:pause()
             -- else
             --     self._countDown:resume()
             -- end
-            print("Button ended")
-        end}):addToContainer():align(display.CENTER, display.width, display.cy)
+        end):addToContainer():align(display.CENTER, display.width, display.cy)
 
 	-- logger:debug("fsdfdsfsd")
 
@@ -46,7 +44,7 @@ function MainScene:ctor()
 
     -- Panel.new({bg = "imgIcoBg30.png", isScale9 = true}):setSize(200, 200):align(display.CENTER, display.cx, display.cy):show()
 
-    JAlert.new({bg = "imgIcoBg30.png", isScale9 = true}):setSize(300, 200):align(display.CENTER, display.cx, display.cy):show(true, true, function (isOK)
+    local alert = JAlert.new({bg = "imgIcoBg30.png", isScale9 = true}):setSize(300, 200):align(display.LEFT_TOP, display.cx, display.cy):show(true, true, function (isOK)
         print(isOK)
     end)
 
@@ -54,6 +52,11 @@ function MainScene:ctor()
     --     print("11111111111")
     -- end):addToContainer():align(display.CENTER, display.cx, display.cy - 50)
     -- self._countDown:start(4, 0)
+
+    -- local s = display.newSprite("imgIcoBg30.png"):addTo(self)--:pos(display.cx, display.cy)
+    -- s:setAnchorPoint(display.ANCHOR_POINTS[display.LEFT_BOTTOM])
+    -- display.newCircle(3, {x = 0, y = 0, fillColor = cc.c4f(1, 0, 0, 1)}):addTo(s)
+    -- s:setRotation(45)
 end
 
 function MainScene:onEnter()

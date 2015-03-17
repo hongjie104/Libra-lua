@@ -24,8 +24,9 @@ end)
 -- @param param {normmal = "按钮正常状态时图片", down = "按钮按下状态图片", unabled = "按钮不可用状态图片",  label = {text = "按钮文字", size = 24}}
 -- scale9 = ccsize 如果有值,说明是九宫图, capInsets = CCRect,
 -- @param functions {onTouchBegan = 按下时的回调, onTouchMoved = 触摸移动时的回调, onTouchEnded = 触摸结束时的回调}
-function JButton:ctor(param, functions)
+function JButton:ctor(param, onClicked, functions)
 	self._param = param
+	self._onClicked = onClicked
 	self._functions = functions or {}
 	makeUIComponent(self)
 
@@ -71,7 +72,11 @@ function JButton:checkTouchIn(x, y)
 end
 
 function JButton:doClick()
-	self:onTouchEnded()
+	if self._onClicked then
+		if type(self._onClicked) == "function" then
+			self._onClicked()
+		end
+	end
 end
 
 function JButton:alignLabel(align, x, y)
@@ -110,6 +115,7 @@ function JButton:onTouch(evt)
 		end
 		if self:isPointIn(evt.x, evt.y) then
 			self:onTouchEnded(evt)
+			self:doClick()
 		end
 	end
 end

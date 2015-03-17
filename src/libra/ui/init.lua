@@ -43,6 +43,29 @@ local function closeBorder(self)
 	end
 end
 
+--[[
+local function showAnchorPoint(self)
+	-- if self._anchorPoint then
+	-- 	self._anchorPoint:setVisible(true)
+	-- else
+	-- 	self._anchorPoint = display.newCircle(3, {x = 0, y = 0, fillColor = cc.c4f(1, 0, 0, 1)}):addTo(self)
+	-- end
+	if not self._anchorPoint then
+		self._anchorPoint = display.newCircle(3, {x = 0, y = 0, fillColor = cc.c4f(1, 0, 0, 1)}):addTo(self)
+	end
+	return self
+end
+
+local function closeAnchorPoint(self)
+	-- if self._anchorPoint then
+	-- 	self._anchorPoint:setVisible(false)
+	-- end
+	if self._anchorPoint then
+		self._anchorPoint:removeSelf()
+	end
+end
+]]
+
 local function addToContainer(self, container)
 	local container = container or libraUIManager:getUIContainer()
 	assert(container.isContainer, "libra.ui.init.addToContainer() - invalid container")
@@ -70,6 +93,10 @@ function makeUIComponent(component)
 
     component.showBorder = showBorder
     component.closeBorder = closeBorder
+    --[[
+    component.showAnchorPoint = showAnchorPoint
+    component.closeAnchorPoint = closeAnchorPoint
+    ]]
     component.addToContainer = addToContainer
 end
 
