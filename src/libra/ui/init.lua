@@ -43,35 +43,36 @@ local function closeBorder(self)
 	end
 end
 
---[[
-local function showAnchorPoint(self)
-	-- if self._anchorPoint then
-	-- 	self._anchorPoint:setVisible(true)
-	-- else
-	-- 	self._anchorPoint = display.newCircle(3, {x = 0, y = 0, fillColor = cc.c4f(1, 0, 0, 1)}):addTo(self)
-	-- end
-	if not self._anchorPoint then
-		self._anchorPoint = display.newCircle(3, {x = 0, y = 0, fillColor = cc.c4f(1, 0, 0, 1)}):addTo(self)
-	end
-	return self
-end
+-- local function onDragHandler(self, evt)
+-- 	if evt.name == "began" then
+-- 		return true
+-- 	elseif evt.name == "moved" then
+-- 		self:addXY(evt.x - evt.prevX, evt.y - evt.prevY)
+-- 	end
+-- end
 
-local function closeAnchorPoint(self)
-	-- if self._anchorPoint then
-	-- 	self._anchorPoint:setVisible(false)
-	-- end
-	if self._anchorPoint then
-		self._anchorPoint:removeSelf()
-	end
-end
-]]
+-- local function dragabled(self, bool)
+-- 	if type(bool) == "boolean" then
+-- 		if self._dragabled ~= bool then
+-- 			self._dragabled = bool
+-- 			if self._dragabled then
+-- 				self:setTouchEnabled(true)
+-- 				self:addNodeEventListener(cc.NODE_TOUCH_EVENT, handler(self, onDragHandler))
+-- 			else
+-- 				self:setTouchEnabled(false)
+-- 			end
+-- 		end
+-- 		return self
+-- 	end
+-- 	return self._dragabled
+-- end
 
-local function addToContainer(self, container)
+local function addToContainer(self, container, zorder)
 	local container = container or libraUIManager:getUIContainer()
 	assert(container.isContainer, "libra.ui.init.addToContainer() - invalid container")
 	assert(container:isContainer(), "libra.ui.init.addToContainer() - invalid container")
 	if container ~= self then
-		self:addTo(container)
+		self:addTo(container, zorder)
 	end
 	return self
 end
@@ -91,12 +92,11 @@ function makeUIComponent(component)
 	component._name = ''
     component.name = name
 
+    -- component._dragabled = false
+    -- component.dragabled = dragabled
+
     component.showBorder = showBorder
     component.closeBorder = closeBorder
-    --[[
-    component.showAnchorPoint = showAnchorPoint
-    component.closeAnchorPoint = closeAnchorPoint
-    ]]
     component.addToContainer = addToContainer
 end
 

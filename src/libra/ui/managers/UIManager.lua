@@ -7,6 +7,7 @@ local UIManager = class("UIManager")
 
 function UIManager:ctor()
 	self._uiContainer = require("libra.ui.components.JContainer").new()
+	self._uiContainer:setSize(display.width, display.height)
 	self._uiContainer:retain()
 end
 

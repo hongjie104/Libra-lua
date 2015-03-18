@@ -27,7 +27,7 @@ end)
 function JButton:ctor(param, onClicked, functions)
 	self._param = param
 	self._onClicked = onClicked
-	self._functions = functions or {}
+	self._functions = functions
 	makeUIComponent(self)
 
 	if param.scale9 then
@@ -67,8 +67,12 @@ function JButton:enabled(bool)
 	return self._enabled
 end
 
-function JButton:checkTouchIn(x, y)
-    return 
+function JButton:onClicked(fun)
+	self._onClicked = fun
+end
+
+function JButton:functions(funs)
+	self._functions = funs
 end
 
 function JButton:doClick()
@@ -81,13 +85,19 @@ end
 
 function JButton:alignLabel(align, x, y)
 	if self._label then
-		self._label:alignLabel(align, x, y)
+		self._label:align(align, x, y)
 	end
 	return self
 end
 
+function JButton:isTouchMoved()
+	return self._isTouchMoved
+end
+
 function JButton:onTouch(evt)
 	if evt.name == "began" then
+		self._isTouchMoved = false
+		self._prevX, self._prevY = evt.x, evt.y
 		if self._param.down then
 			if self._scale9 then
 				self._scale9:removeSelf()
@@ -101,6 +111,9 @@ function JButton:onTouch(evt)
 		self:onTouchBegan(evt)
 		return true
 	elseif evt.name == "moved" then
+		if math.abs(evt.x - self._prevX) > 10 or math.abs(evt.y - self._prevY) > 10 then
+			self._isTouchMoved = true
+		end
 		self:onTouchMoved(evt)
 	elseif evt.name == "ended" then
 		if self._param.down then
@@ -117,29 +130,30 @@ function JButton:onTouch(evt)
 			self:onTouchEnded(evt)
 			self:doClick()
 		end
+		self._isTouchMoved = false
 	end
 end
 
 function JButton:onTouchBegan(evt)
-	if self._functions.onTouchBegan then
+	if self._functions and self._functions.onTouchBegan then
 		if type(self._functions.onTouchBegan) == "function" then
-			self._functions.onTouchBegan(evt)
+			self._functions.onTouchBegan(self, evt)
 		end
 	end
 end
 
 function JButton:onTouchMoved(evt)
-	if self._functions.onTouchMoved then
+	if self._functions and self._functions.onTouchMoved then
 		if type(self._functions.onTouchMoved) == "function" then
-			self._functions.onTouchMoved(evt)
+			self._functions.onTouchMoved(self, evt)
 		end
 	end
 end
 
 function JButton:onTouchEnded(evt)
-	if self._functions.onTouchEnded then
+	if self._functions and self._functions.onTouchEnded then
 		if type(self._functions.onTouchEnded) == "function" then
-			self._functions.onTouchEnded(evt)
+			self._functions.onTouchEnded(self, evt)
 		end
 	end
 end

@@ -12,6 +12,10 @@ if LUA_UPDATE then
 	end
 end
 
+if LUA_UI_EDITOR then
+	import(".uiEditor.init")
+end
+
 logger = import(".log4q.Logger")
 
 local Node = cc.Node
@@ -30,6 +34,12 @@ function Node:y(int)
 		return self
 	end
     return self:getPositionY()
+end
+
+function Node:addXY(x, y)
+	local oldX, oldY = self:getPosition()
+	self:setPosition(oldX + x, oldY + y)
+	return self
 end
 
 function Node:isPointIn(x, y)

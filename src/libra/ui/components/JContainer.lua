@@ -16,7 +16,7 @@ end
 
 function JContainer:setSize(width, height)
 	self:actualWidth(width):actualHeight(height)
-	if self._param.bg then
+	if self._param and self._param.bg then
 		if self._bg then
 			if self._param.isScale9 then
 				self._bg:setContentSize(cc.size(width, height))
