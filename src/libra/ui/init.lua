@@ -43,36 +43,12 @@ local function closeBorder(self)
 	end
 end
 
--- local function onDragHandler(self, evt)
--- 	if evt.name == "began" then
--- 		return true
--- 	elseif evt.name == "moved" then
--- 		self:addXY(evt.x - evt.prevX, evt.y - evt.prevY)
--- 	end
--- end
-
--- local function dragabled(self, bool)
--- 	if type(bool) == "boolean" then
--- 		if self._dragabled ~= bool then
--- 			self._dragabled = bool
--- 			if self._dragabled then
--- 				self:setTouchEnabled(true)
--- 				self:addNodeEventListener(cc.NODE_TOUCH_EVENT, handler(self, onDragHandler))
--- 			else
--- 				self:setTouchEnabled(false)
--- 			end
--- 		end
--- 		return self
--- 	end
--- 	return self._dragabled
--- end
-
-local function addToContainer(self, container, zorder)
+local function addToContainer(self, container, zOrder)
 	local container = container or libraUIManager:getUIContainer()
 	assert(container.isContainer, "libra.ui.init.addToContainer() - invalid container")
 	assert(container:isContainer(), "libra.ui.init.addToContainer() - invalid container")
 	if container ~= self then
-		self:addTo(container, zorder)
+		container:addComponent(self, zOrder)
 	end
 	return self
 end
@@ -89,11 +65,8 @@ function makeUIComponent(component)
 	component:actualWidth(size.width)
 	component:actualHeight(size.height)
 
-	component._name = ''
+	component._name = component.class.__cname
     component.name = name
-
-    -- component._dragabled = false
-    -- component.dragabled = dragabled
 
     component.showBorder = showBorder
     component.closeBorder = closeBorder

@@ -67,18 +67,22 @@ function JButton:enabled(bool)
 	return self._enabled
 end
 
+--- 设置点击事件
 function JButton:onClicked(fun)
 	self._onClicked = fun
 end
 
+--- 设置触摸事件
+-- @param funs {onTouchBegan = fun, onTouchMoved = fun, onTouchEnded = fun}
 function JButton:functions(funs)
 	self._functions = funs
 end
 
+--- 触发点击事件
 function JButton:doClick()
 	if self._onClicked then
 		if type(self._onClicked) == "function" then
-			self._onClicked()
+			self._onClicked(self)
 		end
 	end
 end

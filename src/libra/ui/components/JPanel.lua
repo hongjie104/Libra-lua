@@ -14,9 +14,9 @@ function JPanel:ctor(param)
 	self._isShowing = false
 end
 
-function JPanel:show()
+function JPanel:show(container)
 	if not self._isShowing then
-		self:addToContainer()
+		self:addToContainer(container)
 		self._isShowing = true
 	end
 	return self

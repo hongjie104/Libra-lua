@@ -8,4 +8,5 @@ end
 
 package.path = package.path .. ";src/"
 cc.FileUtils:getInstance():setPopupNotify(false)
+cc.FileUtils:getInstance():addSearchPath("res/")
 require("app.MyApp").new():run()

@@ -14,6 +14,38 @@ function JContainer:ctor(param)
 	self._componentList = {}
 end
 
+function JContainer:createUI(uiConfig)
+	local uiComponent = nil
+	for _, ui in ipairs(uiConfig) do
+		uiComponent = require(ui.ui).new(ui.param):addToContainer(self)
+		if ui.id then
+			self[ui.id] = uiComponent
+		end
+	    for k, v in pairs(ui) do
+	        if k ~= "id" and k ~= 'ui' and k ~= 'param' then
+	            if type(uiComponent[k]) == "function" then
+	                if type(v) == "table" then
+	                	local l = #v
+	                    if l == 1 then
+	                        uiComponent[k](uiComponent, v[1])
+	                    elseif l == 2 then
+	                        uiComponent[k](uiComponent, v[1], v[2])
+	                    elseif l == 3 then
+	                        uiComponent[k](uiComponent, v[1], v[2], v[3])
+	                    elseif l == 4 then
+	                        uiComponent[k](uiComponent, v[1], v[2], v[3], v[4])
+	                    elseif l == 5 then
+	                        uiComponent[k](uiComponent, v[1], v[2], v[3], v[4], v[5])
+	                    end
+	                else
+	                    uiComponent[k](uiComponent, v)
+	                end
+	            end
+	        end
+	    end
+	end
+end
+
 function JContainer:setSize(width, height)
 	self:actualWidth(width):actualHeight(height)
 	if self._param and self._param.bg then
@@ -40,9 +72,12 @@ function JContainer:isContainer()
 	return true
 end
 
-function JContainer:addComponent(component)
+function JContainer:addComponent(component, zOrder)
 	if not table.indexof(self._componentList, component) then
 		self:addChild(component)
+		if zOrder then
+			self:setLocalZOrder(zOrder)
+		end
 		self._componentList[#self._componentList + 1] = component
 	end
 end
