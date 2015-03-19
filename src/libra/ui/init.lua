@@ -5,7 +5,10 @@
 
 local function actualWidth(self, int)
 	if int then
-		self._actualWidth = int
+		if self._actualWidth ~= int then
+			self._actualWidth = int
+			self:setContentSize(self._actualWidth, self._actualHeight)
+		end
 		return self
 	end
 	return self._actualWidth
@@ -13,7 +16,10 @@ end
 
 local function actualHeight(self, int)
 	if int then
-		self._actualHeight = int
+		if self._actualHeight ~= int then
+			self._actualHeight = int
+			self:setContentSize(self._actualWidth, self._actualHeight)
+		end
 		return self
 	end
 	return self._actualHeight
@@ -73,9 +79,10 @@ function makeUIComponent(component)
     component.addToContainer = addToContainer
 end
 
--- Direction = {
--- 	HORIZONTAL = 0,
--- 	VERTICAL = 1
--- }
+Direction = {
+	BOTH = 0,
+	VERTICAL = 1,
+	HORIZONTAL = 2
+}
 
 libraUIManager = require("libra.ui.managers.UIManager").new()

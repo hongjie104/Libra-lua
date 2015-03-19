@@ -7,16 +7,12 @@ local JScrollView = class("JScrollView", function ()
 	return cc.ClippingRegionNode:create()
 end)
 
-JScrollView.DIRECTION_BOTH		 = 0
-JScrollView.DIRECTION_VERTICAL	 = 1
-JScrollView.DIRECTION_HORIZONTAL = 2
-
 function JScrollView:ctor(param)
 	makeUIComponent(self)
 	self:isBounceable(true)
 
 	if param then
-		self._direction = param.direction or JScrollView.DIRECTION_BOTH
+		self._direction = param.direction or Direction.BOTH
 		self:viewRect(param.viewRect)
 		self._sbH = param.scrollbarImgH and display.newScale9Sprite(param.scrollbarImgH):addTo(self)
 		self._sbV = param.scrollbarImgV and display.newScale9Sprite(param.scrollbarImgV):addTo(self)
@@ -58,14 +54,14 @@ function JScrollView:isBounceable(bool)
 end
 
 --- 重置位置,主要用在纵向滚动时
--- function JScrollView:resetPosition()
--- 	if JScrollView.DIRECTION_VERTICAL == self._direction then
--- 		local x, y = self._scrollNode:getPosition()
--- 		local bound = self._scrollNode:getCascadeBoundingBox()
--- 		local disY = self._viewRect.y + self._viewRect.height - bound.y - bound.height
--- 		self._scrollNode:setPosition(x, y + disY)
--- 	end
--- end
+function JScrollView:resetPosition()
+	if Direction.VERTICAL == self._direction then
+		local x, y = self._scrollNode:getPosition()
+		local bound = self:getScrollNodeRect()
+		local disY = self._viewRect.y + self._viewRect.height - bound.y - bound.height
+		self._scrollNode:setPosition(x, y + disY)
+	end
+end
 
 --- 判断一个node是否在滚动控件的显示区域中
 -- @param node item scrollView中的项
@@ -84,7 +80,7 @@ function JScrollView:addScrollNode(node)
 	self._scrollNode = node
 
 	if not self._viewRect then
-		self._viewRect = self._scrollNode:getCascadeBoundingBox()
+		self._viewRect = self:getScrollNodeRect()
 		self:viewRect(self._viewRect)
 	end
 	node:setTouchSwallowEnabled(false)
@@ -175,18 +171,13 @@ end
 function JScrollView:scrollBy(x, y)
 	self._position.x, self._position.y = self:moveXY(self._position.x, self._position.y, x, y)
 	self._scrollNode:setPosition(self._position)
-
-	-- if self._actualRect then
-	-- 	self._actualRect.x = self._actualRect.x + x
-	-- 	self._actualRect.y = self._actualRect.y + y
-	-- end
 end
 
 function JScrollView:scrollAuto()
 	return self:twiningScroll() or self:elasticScroll()
 end
 
-function JScrollView:twiningScroll()
+function JScrollView:twiningScroll()	
 	if self:isSideShow() then
 		return false
 	end
@@ -235,11 +226,10 @@ end
 
 -- 是否显示到边缘
 function JScrollView:isSideShow()
-	local bound = self._scrollNode:getBoundingBox()
-	-- local bound = self._scrollNode:getCascadeBoundingBox()
+	local bound = self:getScrollNodeRect()
 	return bound.x > self._viewRect.x or bound.y > self._viewRect.y
-		or bound.x + bound.width < self._viewRect.x + self._viewRect.width
-		or bound.y + bound.height < self._viewRect.y + self._viewRect.height
+		or self._viewRect.x + self._viewRect.width > bound.x + bound.width 
+		or self._viewRect.y + self._viewRect.height > bound.y + bound.height
 end
 
 function JScrollView:getScrollNodeRect()
@@ -261,7 +251,7 @@ function JScrollView:callListener(event)
 end
 
 function JScrollView:enableScrollBar()
-	local bound = self._scrollNode:getCascadeBoundingBox()
+	local bound = self:getScrollNodeRect()
 	if self._sbV then
 		self._sbV:setVisible(false)
 		transition.stopTarget(self._sbV)
@@ -328,7 +318,7 @@ function JScrollView:onTouch(event)
 			return false
 		end
 		if self._isTouchOnContent then
-			if not cc.rectContainsPoint(self._scrollNode:getCascadeBoundingBox(), cc.p(event.x, event.y)) then
+			if not cc.rectContainsPoint(self:getScrollNodeRect(), cc.p(event.x, event.y)) then
 				return false
 			end
 		end
@@ -347,9 +337,9 @@ function JScrollView:onTouch(event)
 			self._isTouchMoved = true
 			self._scrollSpeed.x, self._scrollSpeed.y = event.x - event.prevX, event.y - event.prevY
 
-			if self.direction == JScrollView.DIRECTION_VERTICAL then
+			if self._direction == Direction.VERTICAL then
 				self._scrollSpeed.x = 0
-			elseif self.direction == JScrollView.DIRECTION_HORIZONTAL then
+			elseif self._direction == Direction.HORIZONTAL then
 				self._scrollSpeed.y = 0
 			end
 
@@ -371,15 +361,15 @@ end
 --- 注册滚动控件的监听函数
 -- @param function listener 监听函数
 -- @return JScrollView
-function JScrollView:onScroll(listener)
+function JScrollView:onScrollListener(listener)
 	self._scrollListener = listener
     return self
 end
 
 function JScrollView:onUpdate(dt)
 	if self._isTouchMoved then
+		local bound = self:getScrollNodeRect()
 		if self._sbV then
-			local bound = self._scrollNode:getCascadeBoundingBox()
 			self._sbV:setVisible(true)
 			local size = self._sbV:getContentSize()
 			local posY = (self._viewRect.y - bound.y) * (self._viewRect.height - size.height) / (bound.height - self._viewRect.height) 
@@ -388,7 +378,6 @@ function JScrollView:onUpdate(dt)
 			self._sbV:setPosition(x, posY)
 		end
 		if self._sbH then
-			local bound = self._scrollNode:getCascadeBoundingBox()
 			self._sbH:setVisible(true)
 			local size = self._sbH:getContentSize()
 			local posX = (self._viewRect.x - bound.x) * (self._viewRect.width - size.width) / (bound.width - self._viewRect.width)

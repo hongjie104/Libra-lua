@@ -11,7 +11,7 @@ local JImage = class("JImage", function(filename, param)
     end
 end)
 
-function JImage:ctor()
+function JImage:ctor(filename, param)
 	makeUIComponent(self)
 end
 

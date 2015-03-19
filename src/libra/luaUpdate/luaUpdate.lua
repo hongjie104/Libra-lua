@@ -46,29 +46,22 @@ end
 
 --- 收到服务器传来的数据
 function SocketHandler:onData(event)
-	local data = event.data
-	local startIndex, endIndex = string.find(data, "src")
-	if not startIndex then
-		startIndex, endIndex = string.find(data, "scripts")
+	local dataList = string.split(event.data, ' ')
+	for _, data in ipairs(dataList) do
+		if package.loaded[data] then
+			package.loaded[data] = nil
+			require(data)
+			logger:info(string.format("热更新lua代码:%s", data))
+		end
 	end
-	data = string.sub(data, endIndex + 2)
-	data = string.gsub(data, "(%.lua)", "")
-	data = string.gsub(data, "\\", ".")
-	if package.loaded[data] then
-		package.loaded[data] = nil
-		require(data)
-
-		-- 先把UI都删掉
-		libraUIManager:getUIContainer():removeAllChildren(true)
-		-- 然后当前场景也要重载一下
-		local runningScene = display.getRunningScene()
-		local filePath = "app.scenes." .. runningScene.class.__cname
-		package.loaded[filePath] = nil
-		require(filePath)
-		display.replaceScene(require("libra.luaUpdate.TempScene").new(filePath))
-
-		logger:info(string.format("热更新lua代码:%s", data))
-	end
+	-- 先把UI都删掉
+	libraUIManager:getUIContainer():removeAllChildren(true)
+	-- 然后当前场景也要重载一下
+	local runningScene = display.getRunningScene()
+	local filePath = "app.scenes." .. runningScene.class.__cname
+	package.loaded[filePath] = nil
+	require(filePath)
+	display.replaceScene(require("libra.luaUpdate.TempScene").new(filePath))
 end
 
 return SocketHandler

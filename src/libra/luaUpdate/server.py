@@ -3,30 +3,47 @@
 
 import socket, select
 
-#Function to broadcast chat messages to all connected clients
-def broadcast_data (sock, message):
+# #Function to broadcast chat messages to all connected clients
+# def broadcast_data (sock, message):
+# 	#Do not send the message to master socket and the client who has send us the message
+# 	print("send msg:", message)
+# 	for socket in CONNECTION_LIST:
+# 		if socket != server_socket and socket != sock :
+# 			try :
+# 				socket.send(message)
+# 			except :
+# 				# broken socket connection may be, chat client pressed ctrl+c for example
+# 				socket.close()
+# 				CONNECTION_LIST.remove(socket)
+
+def send2Lua(sock, updateLuaList):
 	#Do not send the message to master socket and the client who has send us the message
-	print("send msg:", message)
-	for socket in CONNECTION_LIST:
-		if socket != server_socket and socket != sock :
-			try :
-				socket.send(message)
-			except :
-				# broken socket connection may be, chat client pressed ctrl+c for example
-				socket.close()
-				CONNECTION_LIST.remove(socket)
+	if len(updateLuaList) > 0:
+		message = ''
+		for x in updateLuaList:
+			message += message and ' ' + x or x
+			print('lua file:', x)
+		for socket in CONNECTION_LIST:
+			if socket != server_socket and socket != sock :
+				try :
+					socket.send(message)
+				except :
+					# broken socket connection may be, chat client pressed ctrl+c for example
+					socket.close()
+					CONNECTION_LIST.remove(socket)
 
 if __name__ == "__main__":     
+	updateLuaList = []
     # List to keep track of socket descriptors
 	CONNECTION_LIST = []
-	RECV_BUFFER = 4096 # Advisable to keep it as an exponent of 2
+	RECV_BUFFER = 128 # Advisable to keep it as an exponent of 2
 	PORT = 3630
 
 	server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	# this has no effect, why ?
 	server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 	server_socket.bind(("localhost", PORT))
-	server_socket.listen(2)
+	server_socket.listen(5)
 
 	# Add server socket to the list of readable connections
 	CONNECTION_LIST.append(server_socket)
@@ -53,8 +70,18 @@ if __name__ == "__main__":
 					# a "Connection reset by peer" exception will be thrown
 					data = sock.recv(RECV_BUFFER)
 					if data:
-						# broadcast_data(sock, "\r" + '<' + str(sock.getpeername()) + '> ' + data)
-						broadcast_data(sock, data)
+						if cmp(data, 'updateLua'.encode()) == 0:
+							send2Lua(sock, updateLuaList)
+							updateLuaList = []
+						else:
+							data = data.replace('.lua', '')
+							if data.find('src\\'):
+								data = data.split('src\\')[1]
+							elif data.find('scripts\\'):
+								data = data.split('scripts\\')[1]
+							data = data.replace('\\', '.')
+							if not data in updateLuaList:
+								updateLuaList.append(data)
 				except:
 					# broadcast_data(sock, "Client (%s, %s) is offline" % addr)
 					print "Client (%s, %s) is offline" % addr
