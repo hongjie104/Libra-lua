@@ -82,7 +82,11 @@ end
 Direction = {
 	BOTH = 0,
 	VERTICAL = 1,
-	HORIZONTAL = 2
+	HORIZONTAL = 2,
+	LEFT_TO_RIGHT = 3,
+	RIGHT_TO_LEFT = 4,
+	TOP_TO_BOTTOM = 5,
+	BOTTOM_TO_TOP = 6
 }
 
 libraUIManager = require("libra.ui.managers.UIManager").new()

@@ -39,6 +39,12 @@ function MainScene:ctor()
 
     -- JListView.new({viewRect = {x = 0, y = 0, width = 200, height = 200}}):addToContainer()
 
+    --[[
+    self._listDataList = {}
+    for i = 1, 50 do
+        self._listDataList[i] = i
+    end
+
     self.lv = JListView.new {
         -- bgColor = cc.c4b(200, 200, 200, 120),
         -- bg = "sunset.png",
@@ -56,10 +62,13 @@ function MainScene:ctor()
     self.lv:reload()
 
     Button.new({normal = "btnRed2_normal.png", down = "btnRed2_down.png"}, function ()
-        -- self.lv
+        table.remove(self._listDataList, 3)
+        self.lv:reload(false)
     end):align(display.CENTER, display.cx + 200, display.cy):addTo(self)
+    ]]
 end
 
+--[[
 function MainScene:touchListener8(event)
     local listView = event.listView
     if "clicked" == event.name then
@@ -70,13 +79,13 @@ end
 function MainScene:sourceDelegate(listView, tag, idx)
     -- print(string.format("TestUIListViewScene tag:%s, idx:%s", tostring(tag), tostring(idx)))
     if JListView.COUNT_TAG == tag then
-        return 100
+        return #self._listDataList
     elseif JListView.CELL_TAG == tag then
         local item = self.lv:dequeueItem()
         local content
         if not item then
             content = cc.ui.UILabel.new(
-                    {text = "item"..idx,
+                    {text = "item" .. idx,
                     size = 20,
                     align = cc.ui.TEXT_ALIGN_CENTER,
                     color = display.COLOR_WHITE})
@@ -84,12 +93,13 @@ function MainScene:sourceDelegate(listView, tag, idx)
         else
             content = item:getContent()
         end
-        content:setString("item:" .. idx)
+        content:setString("item:" .. self._listDataList[idx])
         item:actualWidth(120):actualHeight(30)
         return item
     else
     end
 end
+]]
 
 function MainScene:onEnter()
 end

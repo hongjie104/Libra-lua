@@ -16,7 +16,7 @@ function JListView:ctor(param)
 
 	self._direction = param.direction or Direction.VERTICAL
 	self._itemList = { }
-	self._containerSize = {width = 0, height = 0}
+	-- self._containerSize = {width = 0, height = 0}
 	self._freeItemList = { }
 	self._redundancyViewVal = 0 --异步的视图两个方向上的冗余大小,横向代表宽,竖向代表高
 
@@ -60,12 +60,11 @@ end
 --- 加载列表
 -- @function [parent=#JListView] reload
 -- @return JListView#JListView
-function JListView:reload()
-	if true then
-		self:asyncLoad()
-	-- else
-	-- 	self:layout_()
+function JListView:reload(resetPosition)
+	if resetPosition == nil then
+		resetPosition = true
 	end
+	self:asyncLoad(resetPosition)
 	return self
 end
 
@@ -82,31 +81,28 @@ function JListView:dequeueItem()
 	end
 end
 
-function JListView:moveItems(beginIdx, endIdx, x, y, bAni)
-	if 0 == endIdx then
-		self:elasticScroll()
-	end
-	local posX, posY = 0, 0
-	local moveByParams = {x = x, y = y, time = 0.2}
-	for i = beginIdx, endIdx do
-		if bAni then
-			if i == beginIdx then
-				moveByParams.onComplete = function()
-					self:elasticScroll()
-				end
-			else
-				moveByParams.onComplete = nil
-			end
-			transition.moveBy(self._itemList[i], moveByParams)
-		else
-			posX, posY = self._itemList[i]:getPosition()
-			self._itemList[i]:setPosition(posX + x, posY + y)
-			if i == beginIdx then
-				self:elasticScroll()
-			end
-		end
-	end
-end
+-- function JListView:moveItems(beginIdx, endIdx, x, y, bAni)
+-- 	local posX, posY = 0, 0
+-- 	local moveByParams = {x = x, y = y, time = 0.2}
+-- 	for i = beginIdx, endIdx do
+-- 		if bAni then
+-- 			if i == beginIdx then
+-- 				moveByParams.onComplete = function()
+-- 					self:elasticScroll()
+-- 				end
+-- 			else
+-- 				moveByParams.onComplete = nil
+-- 			end
+-- 			transition.moveBy(self._itemList[i], moveByParams)
+-- 		else
+-- 			posX, posY = self._itemList[i]:getPosition()
+-- 			self._itemList[i]:setPosition(posX + x, posY + y)
+-- 			if i == beginIdx then
+-- 				self:elasticScroll()
+-- 			end
+-- 		end
+-- 	end
+-- end
 
 function JListView:notifyListener(event)
 	if self._touchListener and type(self._touchListener) == "function" then
@@ -192,7 +188,7 @@ function JListView:increaseOrReduceItem()
 		item = self._itemList[1]
 		if not item then return end
 		local disH = cascadeBound.y + cascadeBound.height - self._viewRect.y - self._viewRect.height
-		local tempIdx = item.idx
+		local tempIdx = item:index()
 		if disH > self._redundancyViewVal then
 			itemW, itemH = item:actualWidth(), item:actualHeight()
 			if cascadeBound.height - itemH > self._viewRect.height
@@ -218,7 +214,7 @@ function JListView:increaseOrReduceItem()
 		item = self._itemList[#self._itemList]
 		if not item then return end
 
-		tempIdx = item.idx
+		tempIdx = item:index()
 		if disH > self._redundancyViewVal then
 			itemW, itemH = item:actualWidth(), item:actualHeight()
 			if cascadeBound.height - itemH > self._viewRect.height
@@ -242,7 +238,7 @@ function JListView:increaseOrReduceItem()
 		--left part of view
 		local disW = self._viewRect.x - cascadeBound.x
 		item = self._itemList[1]
-		local tempIdx = item.idx
+		local tempIdx = item:index()
 		if disW > self._redundancyViewVal then
 			itemW, itemH = item:actualWidth(), item:actualHeight()
 			if cascadeBound.width - itemW > self._viewRect.width
@@ -266,7 +262,7 @@ function JListView:increaseOrReduceItem()
 		--right part of view
 		disW = cascadeBound.x + cascadeBound.width - self._viewRect.x - self._viewRect.width
 		item = self._itemList[#self._itemList]
-		tempIdx = item.idx
+		tempIdx = item:index()
 		if disW > self._redundancyViewVal then
 			itemW, itemH = item:actualWidth(), item:actualHeight()
 			if cascadeBound.width - itemW > self._viewRect.width
@@ -302,8 +298,9 @@ function JListView:removeAllItems()
 end
 
 --- 异步加载列表数据
-function JListView:asyncLoad()
+function JListView:asyncLoad(resetPosition)
 	self:removeAllItems()
+	local oldPositionX, oldPositionY = self._container:getPosition()
 	self._container:setPosition(0, 0)
 	self._container:setContentSize(cc.size(0, 0))
 
@@ -327,11 +324,15 @@ function JListView:asyncLoad()
 	end
 
 	-- self._container:setPosition(self._viewRect.x, self._viewRect.y)
-	if Direction.VERTICAL == self._direction then
-		self._container:setPosition(self._viewRect.x,
-			self._viewRect.y + self._viewRect.height)
+	if resetPosition then
+		if Direction.VERTICAL == self._direction then
+			self._container:setPosition(self._viewRect.x,
+				self._viewRect.y + self._viewRect.height)
+		else
+			self._container:setPosition(self._viewRect.x, self._viewRect.y)
+		end
 	else
-		self._container:setPosition(self._viewRect.x, self._viewRect.y)
+		self._container:setPosition(oldPositionX, oldPositionY)
 	end
 	return self
 end
@@ -357,7 +358,7 @@ function JListView:loadOneItem(originPoint, idx, bBefore)
 		logger:error("ERROR! JListView load nil item")
 		return
 	end
-	item.idx = idx
+	item:index(idx)
 	itemW, itemH = item:actualWidth(), item:actualHeight()
 	if Direction.VERTICAL == self._direction then
 		itemW = itemW or 0
@@ -396,8 +397,8 @@ end
 -- @private
 function JListView:unloadOneItem(idx)
 	local item = self._itemList[1]
-	if item and item.idx <= idx then
-		local unloadIdx = idx - item.idx + 1
+	if item and item:index() <= idx then
+		local unloadIdx = idx - item:index() + 1
 		item = self._itemList[unloadIdx]
 		if item then
 			table.remove(self._itemList, unloadIdx)
@@ -443,7 +444,7 @@ function JListView:onScrollHandler(event)
 				local itemW, itemH = v:actualWidth(), v:actualHeight()
 				itemRect = cc.rect(posX, posY, itemW, itemH)
 				if cc.rectContainsPoint(itemRect, nodePoint) then
-					pos, idx = i, v.idx
+					pos, idx = i, v:index()
 					break
 				end
 			end

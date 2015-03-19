@@ -19,14 +19,14 @@ function BoxLayout:updateLayout()
 			local x = (containerWidth - self._componentList[1]:actualWidth()) / -2
 			local y = (containerHeight - self._componentList[1]:actualHeight()) / 2
 			for _, v in ipairs(self._componentList) do
-				v:x(x):y(y)
+				v:pos(x, y)
 				x = x + v:actualWidth() + self._gap
 			end
 		else
 			local x = (containerWidth - self._componentList[1]:actualWidth()) / -2
 			local y = (containerHeight - self._componentList[1]:actualHeight()) / 2
 			for _, v in ipairs(self._componentList) do
-				v:x(x):y(y)
+				v:pos(x, y)
 				y = y - v:actualHeight() - self._gap
 			end
 		end

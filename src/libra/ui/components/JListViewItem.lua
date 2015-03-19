@@ -12,10 +12,19 @@ function JListViewItem:ctor(content)
 	makeUIComponent(self)
 
 	self._content = content:addTo(self)
+	self._index = 0
 end
 
 function JListViewItem:getContent()
 	return self._content
+end
+
+function JListViewItem:index(int)
+	if type(int) == "number" then
+		self._index = int
+		return self
+	end
+	return self._index
 end
 
 return JListViewItem
