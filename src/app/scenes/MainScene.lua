@@ -16,10 +16,6 @@ local MainScene = class("MainScene", function()
 end)
 
 function MainScene:ctor()
-    libraUIManager:getUIContainer():addTo(self)
-    if LUA_UI_EDITOR then
-        import("libra.uiEditor.UIEditorContainer").new():addToContainer()
-    end
 
     -- local test = {
     --                 {id = "_testBtn", ui = "libra.ui.components.JButton", param = {normal = "btnRed2_normal.png", down1 = "btnRed2_down.png", label = {text = "hello world", size = 24}}, x = display.cx, y = display.cy},
@@ -39,22 +35,22 @@ function MainScene:ctor()
 
     -- JListView.new({viewRect = {x = 0, y = 0, width = 200, height = 200}}):addToContainer()
 
-    --[[
+    ----[[
     self._listDataList = {}
     for i = 1, 50 do
         self._listDataList[i] = i
     end
 
-    self.lv = JListView.new {
+    self.lv = JListView.new({
         -- bgColor = cc.c4b(200, 200, 200, 120),
         -- bg = "sunset.png",
         -- bgScale9 = true,
         -- async = true,
         -- viewRect = cc.rect(360, 40, 400, 80),
-        viewRect = cc.rect(360, 40, 120, 400),
+        viewRect = cc.rect(360, 40, 120, 40),
         -- direction = Direction.HORIZONTAL,
         -- scrollbarImgV = "barH.png"
-        }:onTouchListener(handler(self, self.touchListener8))
+        }):onTouchListener(handler(self, self.touchListener8))
         :addTo(self)
 
     self.lv:setDelegate(handler(self, self.sourceDelegate))
@@ -65,10 +61,10 @@ function MainScene:ctor()
         table.remove(self._listDataList, 3)
         self.lv:reload(false)
     end):align(display.CENTER, display.cx + 200, display.cy):addTo(self)
-    ]]
+    --]]
 end
 
---[[
+----[[
 function MainScene:touchListener8(event)
     local listView = event.listView
     if "clicked" == event.name then
@@ -78,9 +74,9 @@ end
 
 function MainScene:sourceDelegate(listView, tag, idx)
     -- print(string.format("TestUIListViewScene tag:%s, idx:%s", tostring(tag), tostring(idx)))
-    if JListView.COUNT_TAG == tag then
+    if TAG.COUNT_TAG == tag then
         return #self._listDataList
-    elseif JListView.CELL_TAG == tag then
+    elseif TAG.CELL_TAG == tag then
         local item = self.lv:dequeueItem()
         local content
         if not item then
@@ -99,12 +95,14 @@ function MainScene:sourceDelegate(listView, tag, idx)
     else
     end
 end
-]]
+--]]
 
 function MainScene:onEnter()
+    sceneOnEnter(self)
 end
 
 function MainScene:onExit()
+    sceneOnExit(self)
 end
 
 return MainScene

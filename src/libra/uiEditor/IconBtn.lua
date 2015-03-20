@@ -15,7 +15,7 @@ function IconBtn:ctor(param, onClicked)
 		if evt.name == "began" then
 			return true
 		elseif evt.name == "moved" then
-			local newX, newY = self:x() + evt.x - evt.prevX, self:y() + evt.y - evt.prevY
+			local newX, newY = evt.x, evt.y
 			if newX - self._iconWidthHarf < 0 then
 				newX = self._iconWidthHarf
 			elseif newX + self._iconWidthHarf > display.width then

@@ -9,7 +9,7 @@ local JPanel = class("JPanel", require("libra.ui.components.JContainer"))
 function JPanel:ctor(param)
 	JPanel.super.ctor(self, param)
 	-- 添加一个layer以吞噬掉触摸事件
-	display.newLayer():align(display.CENTER):addTo(self, -2)
+	display.newLayer():align(display.CENTER, display.cx, display.cy):addTo(self, -2)
 
 	self._isShowing = false
 end

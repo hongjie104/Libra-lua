@@ -57,11 +57,11 @@ function SocketHandler:onData(event)
 	-- 先把UI都删掉
 	libraUIManager:getUIContainer():removeAllChildren(true)
 	-- 然后当前场景也要重载一下
-	local runningScene = display.getRunningScene()
-	local filePath = "app.scenes." .. runningScene.class.__cname
-	package.loaded[filePath] = nil
-	require(filePath)
-	display.replaceScene(require("libra.luaUpdate.TempScene").new(filePath))
+	local runningSceneName = display.getRunningScene().class.__cname
+	local modulePath = findModulePath("app%.scenes%.%a*%." .. runningSceneName)
+	package.loaded[modulePath] = nil
+	require(modulePath)
+	display.replaceScene(require("libra.luaUpdate.TempScene").new(modulePath))
 end
 
 return SocketHandler

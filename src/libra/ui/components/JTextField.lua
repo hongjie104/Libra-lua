@@ -2,8 +2,8 @@
 -- Author: zhouhongjie@apowo.com
 -- Date: 2015-03-13 10:34:53
 --
-
-local JTextField = class("JTextField", function (param)
+local JTextField
+JTextField = class("JTextField", function (param)
 	if param.isEditBox then
 		return JTextField.newEditBox(param)
 	else
@@ -173,7 +173,9 @@ function JTextField.newTextField(param)
     end
     local editbox = textfieldCls:create()
     editbox:setPlaceHolder(param.placeHolder)
-    editbox:setPosition(param.x, param.y)
+    if param.x and param.y then
+        editbox:setPosition(param.x, param.y)
+    end    
     if param.listener then
         editbox:addEventListener(param.listener)
     end
@@ -203,6 +205,9 @@ function JTextField.newTextField(param)
     if param.passwordChar then
         editbox:setPasswordStyleText(param.passwordChar)
     end
+    -- if param.bg then
+    --     editbox:addChild(display.newSprite(param.bg), -1)
+    -- end
 
     return editbox
 end

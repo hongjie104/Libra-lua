@@ -47,7 +47,8 @@ function JContainer:createUI(uiConfig)
 end
 
 function JContainer:setSize(width, height)
-	self:actualWidth(width):actualHeight(height)
+	-- self:actualWidth(width):actualHeight(height)
+	self._actualWidth, self._actualHeight = width, height
 	if self._param and self._param.bg then
 		if self._bg then
 			if self._param.isScale9 then
@@ -55,9 +56,9 @@ function JContainer:setSize(width, height)
 			end
 		else
 			if self._param.isScale9 then
-				self._bg = display.newScale9Sprite(self._param.bg, 0, 0, cc.size(width, height)):addTo(self, -1)
+				self._bg = display.newScale9Sprite(self._param.bg, display.cx, display.cy, cc.size(width, height)):addTo(self, -1)
 			else
-				display.newSprite(self._param.bg):addTo(self, -1)
+				self._bg = display.newSprite(self._param.bg):addTo(self, -1):pos(display.cx, display.cy)
 			end
 		end
 	end
@@ -76,7 +77,7 @@ function JContainer:addComponent(component, zOrder)
 	if not table.indexof(self._componentList, component) then
 		self:addChild(component)
 		if zOrder then
-			self:setLocalZOrder(zOrder)
+			component:setLocalZOrder(zOrder)
 		end
 		self._componentList[#self._componentList + 1] = component
 	end

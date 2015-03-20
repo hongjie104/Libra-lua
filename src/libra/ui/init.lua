@@ -89,4 +89,10 @@ Direction = {
 	BOTTOM_TO_TOP = 6
 }
 
+TAG = {
+	COUNT_TAG       = "Count",
+	CELL_TAG        = "Cell",
+	UNLOAD_CELL_TAG = "UnloadCell"
+}
+
 libraUIManager = require("libra.ui.managers.UIManager").new()

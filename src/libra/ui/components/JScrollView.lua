@@ -17,6 +17,14 @@ function JScrollView:ctor(param)
 		self._sbH = param.scrollbarImgH and display.newScale9Sprite(param.scrollbarImgH):addTo(self)
 		self._sbV = param.scrollbarImgV and display.newScale9Sprite(param.scrollbarImgV):addTo(self)
 		self:isTouchOnContent(param.touchOnContent or true)
+		if param.bg then
+			local x, y = self._viewRect.x + self._viewRect.width / 2, self._viewRect.y + self._viewRect.height / 2
+			if param.isScale9 then
+				display.newScale9Sprite(param.bg, x, y, cc.size(self._viewRect.width, self._viewRect.height), param.capInsets):addTo(self, -1)
+			else
+				display.newSprite(param.bg, x, y):addTo(self, -1)
+			end
+		end
 	end
 
 	self._scrollSpeed = {x = 0, y = 0}

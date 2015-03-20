@@ -7,10 +7,6 @@ local ListViewItem = import(".JListViewItem")
 
 local JListView = class("JListView", require("libra.ui.components.JScrollView"))
 
-JListView.COUNT_TAG       = "Count"
-JListView.CELL_TAG        = "Cell"
-JListView.UNLOAD_CELL_TAG = "UnloadCell"
-
 function JListView:ctor(param)
 	JListView.super.ctor(self, param)
 
@@ -178,7 +174,6 @@ end
 function JListView:increaseOrReduceItem()
 	if 0 == #self._itemList then return end
 
-	local count = self._delegateFunc(self, JListView.COUNT_TAG)
 	-- 作为是否还需要再增加或减少item的标志,2表示上下两个方向或左右都需要调整
 	local nNeedAdjust = 2 
 	local cascadeBound = self:getContainerCascadeBoundingBox()
@@ -226,7 +221,7 @@ function JListView:increaseOrReduceItem()
 		else
 			item = nil
 			tempIdx = tempIdx + 1
-			if tempIdx <= count then
+			if tempIdx <= self._delegateFunc(self, TAG.COUNT_TAG) then
 				local localPoint = self._container:convertToNodeSpace(cc.p(cascadeBound.x, cascadeBound.y))
 				item = self:loadOneItem(localPoint, tempIdx)
 			end
@@ -274,7 +269,7 @@ function JListView:increaseOrReduceItem()
 		else
 			item = nil
 			tempIdx = tempIdx + 1
-			if tempIdx <= count then
+			if tempIdx <= self._delegateFunc(self, TAG.COUNT_TAG) then
 				local localPoint = self._container:convertToNodeSpace(cc.p(cascadeBound.x + cascadeBound.width, cascadeBound.y))
 				item = self:loadOneItem(localPoint, tempIdx)
 			end
@@ -304,7 +299,7 @@ function JListView:asyncLoad(resetPosition)
 	self._container:setPosition(0, 0)
 	self._container:setContentSize(cc.size(0, 0))
 
-	local count = self._delegateFunc(self, JListView.COUNT_TAG)
+	local count = self._delegateFunc(self, TAG.COUNT_TAG)
 	local item, itemW, itemH = nil, 0, 0
 	local containerW, containerH, posX, posY = 0, 0, 0, 0
 	for i = 1, count do
@@ -353,7 +348,7 @@ function JListView:loadOneItem(originPoint, idx, bBefore)
 	local item, itemW, itemH, containerW, containerH = nil, 0, 0, 0, 0
 	local posX, posY = originPoint.x, originPoint.y
 	local content = nil
-	item = self._delegateFunc(self, JListView.CELL_TAG, idx)
+	item = self._delegateFunc(self, TAG.CELL_TAG, idx)
 	if nil == item then
 		logger:error("ERROR! JListView load nil item")
 		return
@@ -404,7 +399,7 @@ function JListView:unloadOneItem(idx)
 			table.remove(self._itemList, unloadIdx)
 			self:addFreeItem(item)
 			self._container:removeChild(item, false)
-			self._delegateFunc(self, JListView.UNLOAD_CELL_TAG, idx)
+			self._delegateFunc(self, TAG.UNLOAD_CELL_TAG, idx)
 		end
 	end
 end
@@ -492,9 +487,7 @@ function JListView:onUpdate(dt)
 	JListView.super.onUpdate(self, dt)
 
 	self:checkItemsInStatus()
-	if true then
-		self:increaseOrReduceItem()
-	end
+	self:increaseOrReduceItem()
 end
 
 function JListView:onCleanup()

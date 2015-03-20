@@ -3,24 +3,35 @@
 -- Date: 2015-03-18 14:54:51
 --
 
-local UIEditorContainer = class("UIEditorContainer", require("libra.ui.components.JContainer"))
+local Container = require("libra.ui.components.JContainer")
+
+local UIEditorContainer = class("UIEditorContainer", Container)
 
 function UIEditorContainer:ctor()
 	UIEditorContainer.super.ctor(self)
 
-	require("libra.uiEditor.IconBtn").new({normal = "uiEditor/uiEditorIco.jpg"}, function (self)
-		if not self:isTouchMoved() then
-			logger:info('icon被点击了!')
+	self._layer = Container.new():addToContainer(self)
+	self._layer:setVisible(false)
+
+	require("libra.uiEditor.IconBtn").new({normal = "uiEditor/uiEditorIco.jpg"}, function (icon)
+		if not icon:isTouchMoved() then
+			self._layer:setVisible(not self._layer:isVisible())
 		end
-	end):addToContainer(self, 1000)
+	end):addToContainer(self)
 
 	require("libra.uiEditor.Toolbar").new(
-		handler(self, self.showCreateUIPanel)
-		):addToContainer(self):align(display.CENTER, display.cx, display.top - 36)
+		handler(self, self.showCreateUIPanel),
+		handler(self, self.ShowReferencePanel)
+		):addToContainer(self._layer):align(display.CENTER, display.cx, display.top - 36)
 end
 
 function UIEditorContainer:showCreateUIPanel()
-	require("libra.uiEditor.CreateUIPanel").new():pos(display.cx, display.cy):show(self)
+	require("libra.uiEditor.CreateUIPanel").new():show(self._layer)
+end
+
+--- 打开选取参考图的面板
+function UIEditorContainer:ShowReferencePanel()
+	require("libra.uiEditor.ReferencePanel").new():show(self._layer)
 end
 
 return UIEditorContainer
