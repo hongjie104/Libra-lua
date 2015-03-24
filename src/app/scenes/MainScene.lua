@@ -10,6 +10,7 @@ local JAlert = require("libra.ui.components.JAlert")
 local JScrollView = require("libra.ui.components.JScrollView")
 local JListView = require("libra.ui.components.JListView")
 local JImage = require("libra.ui.components.JImage")
+local JNumberScroller = require("libra.ui.components.JNumberScroller")
 
 local MainScene = class("MainScene", function()
     return display.newScene("MainScene")
@@ -17,11 +18,11 @@ end)
 
 function MainScene:ctor()
 
-    -- local test = {
-    --                 {id = "_testBtn", ui = "libra.ui.components.JButton", param = {normal = "btnRed2_normal.png", down1 = "btnRed2_down.png", label = {text = "hello world", size = 24}}, x = display.cx, y = display.cy},
-    --                 {id = "_testBtn1", ui = "libra.ui.components.JButton", param = {normal = "btnRed2_normal.png", down1 = "btnRed2_down.png", label = {text = "hello world", size = 24}}, x = display.cx, y = display.cy + 50}
-    --             }
-    -- libraUIManager:getUIContainer():createUI(test)
+    local test = {
+                    {id = "_testBtn", ui = "libra.ui.components.JButton", param = {normal = "btnRed2_normal.png", down1 = "btnRed2_down.png", label = {text = "hello world", size = 24}}, x = display.cx, y = display.cy},
+                    {id = "_testBtn1", ui = "libra.ui.components.JButton", param = {normal = "btnRed2_normal.png", down1 = "btnRed2_down.png", label = {text = "hello world", size = 24}}, x = display.cx, y = display.cy + 50}
+                }
+    libraUIManager:getUIContainer():createUI(test)
     
     --[[
     local node = JImage.new("COVER.jpg"):align(display.CENTER, 400, 400)
@@ -35,7 +36,7 @@ function MainScene:ctor()
 
     -- JListView.new({viewRect = {x = 0, y = 0, width = 200, height = 200}}):addToContainer()
 
-    ----[[
+    --[[
     self._listDataList = {}
     for i = 1, 50 do
         self._listDataList[i] = i
@@ -62,9 +63,16 @@ function MainScene:ctor()
         self.lv:reload(false)
     end):align(display.CENTER, display.cx + 200, display.cy):addTo(self)
     --]]
+
+    ----[[
+    self._numScroller = JNumberScroller.new():addToContainer():pos(display.cx, display.cy)
+    libraUIManager:getUIContainer()._testBtn:onClicked(function ()
+        self._numScroller:scrollTo(265)
+    end)
+    --]]
 end
 
-----[[
+--[[
 function MainScene:touchListener8(event)
     local listView = event.listView
     if "clicked" == event.name then

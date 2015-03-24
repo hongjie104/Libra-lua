@@ -25,7 +25,7 @@ function JTextFieldWithTip:ctor(param)
 	self._filterTipDataList = { }
 
 	if param.textFieldbg then
-		Image.new(param.textFieldbg):addToContainer(self):pos(param.x, param.y)
+		Image.new(param.textFieldbg, {scale9 = param.isTextFieldbgScale9, size = cc.size(param.width, param.height)}):addToContainer(self):pos(param.x, param.y)
 	end
 	self._textField = TextField.new({placeHolder = "input here!", size = cc.size(param.width, param.height), x = param.x, y = param.y, maxLength = param.maxLength, listener = function (textfield, eventType)
 		if eventType == 0 then
@@ -99,6 +99,10 @@ function JTextFieldWithTip:filterTip(key)
 		end
 		self._tipListView:reload()
 	end
+end
+
+function JTextFieldWithTip:getString()
+	return self._textField:getString()
 end
 
 return JTextFieldWithTip

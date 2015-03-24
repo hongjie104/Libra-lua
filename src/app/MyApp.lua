@@ -11,8 +11,8 @@ function MyApp:ctor()
 end
 
 function MyApp:run()    
-    -- self:enterScene("MainScene")
-    self:enterScene("login.LoginScene")
+    self:enterScene("MainScene")
+    -- self:enterScene("login.LoginScene")
 end
 
 return MyApp

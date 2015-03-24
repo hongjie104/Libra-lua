@@ -31,7 +31,7 @@ end
 
 --- 打开选取参考图的面板
 function UIEditorContainer:ShowReferencePanel()
-	require("libra.uiEditor.ReferencePanel").new():show(self._layer)
+	require("libra.uiEditor.ReferencePanel").new(handler(--[[self, self.showReferenceImg]])):show(self._layer)
 end
 
 return UIEditorContainer
