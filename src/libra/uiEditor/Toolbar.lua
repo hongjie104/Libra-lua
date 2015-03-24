@@ -12,10 +12,10 @@ function Toolbar:ctor(onShowCreateUIPanel, onShowReferencePanel)
 	self:setSize(display.width, 66)
 
 	-- 新建按钮
-	-- Button.new({normal = "uiEditor/btn_normal.png", down = "uiEditor/btn_down.png", 
-	-- 	label = {text = "新建"}}, function ()
-	-- 		onShowCreateUIPanel()
-	-- 	end):addToContainer(self)
+	Button.new({normal = "uiEditor/btn_normal.png", down = "uiEditor/btn_down.png", 
+		label = {text = "新建"}}, function ()
+			onShowCreateUIPanel()
+		end):addToContainer(self)
 
 	-- 载入示意图按钮
 	Button.new({normal = "uiEditor/btn_normal.png", down = "uiEditor/btn_down.png", 

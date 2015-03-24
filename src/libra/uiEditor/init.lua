@@ -3,7 +3,8 @@
 -- Date: 2015-03-17 20:58:50
 --
 
-COMPONENT_LIST = COMPONENT_LIST or {
+COMPONENT_LIST = COMPONENT_LIST or { }
+table.insertto(COMPONENT_LIST, {
 	{name = "Button", path = "libra.ui.components.JButton"},
 	{name = "CheckBox", path = "libra.ui.components.JCheckBox"},
 	{name = "CheckBoxGroup"},
@@ -17,4 +18,4 @@ COMPONENT_LIST = COMPONENT_LIST or {
 	{name = "Panel"},
 	{name = "ScrollView"},
 	{name = "TextField"},
-}
+})

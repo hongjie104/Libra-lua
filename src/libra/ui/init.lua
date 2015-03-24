@@ -95,4 +95,6 @@ TAG = {
 	UNLOAD_CELL_TAG = "UnloadCell"
 }
 
+UI_CONFIG = UI_CONFIG or { }
+
 libraUIManager = require("libra.ui.managers.UIManager").new()

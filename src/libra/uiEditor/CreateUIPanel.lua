@@ -10,7 +10,7 @@ local ListView = require('libra.ui.components.JListView')
 local CreateUIPanel = class("CreateUIPanel", require("libra.uiEditor.Panel"))
 
 function CreateUIPanel:ctor()
-	CreateUIPanel.super.ctor(self, 600, 400)
+	CreateUIPanel.super.ctor(self, display.width, display.height)
 
 	local listViewRect = cc.rect((display.width - self._actualWidth) / 2 + 10, (display.height - self._actualHeight) / 2 + 10, 160, 350)
 	Label.new({text = "组件"}):align(display.CENTER_BOTTOM, listViewRect.x + listViewRect.width / 2, listViewRect.y + listViewRect.height):addToContainer(self)

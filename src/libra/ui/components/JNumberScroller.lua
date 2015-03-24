@@ -13,7 +13,7 @@ function NumCol:ctor(param)
 	param = param or { }
 
 	param.text = '0'
-	self._zeroLabel = Label.new(param):addTo(self):align(display.BOTTOM_LEFT)--:y(self._numsLabel:actualHeight())
+	self._zeroLabel = Label.new(param):addTo(self):align(display.BOTTOM_LEFT)
 	self._fontHeight = self._zeroLabel:getContentSize().height
 
 	local str = '9'
@@ -26,71 +26,83 @@ function NumCol:ctor(param)
 	self._curNum = 0
 end
 
+function NumCol:curNum(int)
+	if int then
+		if self._curNum ~= int then
+			self:scrollTo(int, .1)
+		end
+		return self
+	end
+	return self._curNum
+end
+
 function NumCol:actualWidth()
 	return self._numsLabel:getContentSize().width
 end
 
--- function NumCol:startScroll(onCheck)
--- 	self._onCheck = onCheck
--- 	self:scroll()
--- end
-
--- function NumCol:scroll()
--- 	transition.moveBy(self, {time = .1, y = -self._fontHeight, onComplete = function ()
--- 		self._curNum = self._curNum + 1
--- 		if self._curNum == 1 then
--- 			self._zeroLabel:y(self._fontHeight + self._numsLabel:getContentSize().height)
--- 		elseif self._curNum == 10 then
--- 			self._curNum = 0
--- 			self._zeroLabel:y(0)
--- 			self._numsLabel:y(self._fontHeight)
--- 			self:y(0)
--- 		end
--- 		if type(self._onCheck) == "function" then
--- 			self._onCheck()
--- 		end
--- 	end})
--- end
-
-function NumCol:scroll(times, time)
-	self._totalTimes = times
-	self._curTimes = 0
-	self:doScroll(time)
+function NumCol:getFontHeight()
+	return self._fontHeight
 end
 
-function NumCol:doScroll(time)
-	if self._curTimes ~= self._totalTimes then
-		transition.moveBy(self, {time = time, y = -self._fontHeight, onComplete = function ()
-			self._curNum = self._curNum + 1
-			if self._curNum == 1 then
-				self._zeroLabel:y(self._fontHeight + self._numsLabel:getContentSize().height)
-			elseif self._curNum == 10 then
-				self._curNum = 0
-				self._zeroLabel:y(0)
-				self._numsLabel:y(self._fontHeight)
-				self:y(0)
+function NumCol:scrollTo(num, time, direction)
+	self._targetNum = num
+	time = time or .1
+	if self._targetNum ~= self._curNum then
+		direction = direction or Direction.TOP_TO_BOTTOM
+		self:doScroll(time, direction)
+	end
+end
+
+function NumCol:doScroll(time, direction)
+	if self._targetNum ~= self._curNum then
+		if direction == Direction.TOP_TO_BOTTOM then
+			transition.moveBy(self, {time = time, y = -self._fontHeight, onComplete = function ()
+				self._curNum = self._curNum + 1
+				if self._curNum == 1 then
+					self._zeroLabel:y(self._fontHeight + self._numsLabel:getContentSize().height)
+				elseif self._curNum == 10 then
+					self._curNum = 0
+					self._zeroLabel:y(0)
+					self._numsLabel:y(self._fontHeight)
+					self:y(0)
+				end
+				self:doScroll(time, direction)
+			end})
+		else
+			if self._curNum == 0 then
+				self._numsLabel:y(self._fontHeight * -9)
 			end
-			self._curTimes = self._curTimes + 1
-			print("self._curTimes", self._curTimes, self._totalTimes)
-			self:doScroll(time)
-		end})
-	else
-		print("okokok")
+			transition.moveBy(self, {time = time, y = self._fontHeight, onComplete = function ()
+				self._curNum = self._curNum - 1
+				if self._curNum < 0 then
+					self._curNum = 9
+				elseif self._curNum == 0 then
+					self._zeroLabel:y(0)
+					self._numsLabel:y(self._fontHeight)
+					self:y(0)
+				end
+				self:doScroll(time, direction)
+			end})
+		end
 	end
 end
 
 --===========================================================================================
 
-local JNumberScroller = class("JNumberScroller", require("libra.ui.components.JContainer"))
+-- local JNumberScroller = class("JNumberScroller", require("libra.ui.components.JContainer"))
+local JNumberScroller = class("JNumberScroller", function ()
+	return cc.ClippingRegionNode:create()
+end)
 
 function JNumberScroller:ctor(param)
-	JNumberScroller.super.ctor(self, param)
-	local length = param and param.length or 3
+	makeUIComponent(self)
+	param = param or { }
+	-- JNumberScroller.super.ctor(self, param)
+	local length = param.length or 3
 	if length < 1 then
 		length = 1
 	end
-	local gap = param and param.gap or 5
-	local size = param and param.size or 24
+	local gap = param.gap or 5
 	self._labelList = { }
 	local label, x = nil, -gap
 	for i = 1, length do
@@ -100,33 +112,30 @@ function JNumberScroller:ctor(param)
 		x = x + gap + label:actualWidth()
 	end
 
-	self._targetNum = -1
-	self._curNum = 0
+	self:setClippingRegion({x = 0, y = 0, width = length * self._labelList[1]:actualWidth() + gap * (#self._labelList - 1), height = self._labelList[1]:getFontHeight()})
 
-	-- self._checkHandler = handler(self, self.check)
+	self._curNum = 0
 end
 
-function JNumberScroller:scrollTo(num)
-	if self._targetNum ~= self._curNum then
-		self._targetNum = num
-
-		local times, time, mod = 1, .01, 0
+function JNumberScroller:scrollTo(num, direction)
+	if num ~= self._curNum then
+		self._curNum = num
+		local mode = 0
 		for i = #self._labelList, 1, -1 do
-			mod = num % 10
+			self._labelList[i]:scrollTo(num % 10, .1, direction)
 			num = math.floor(num / 10)
-			times = num * 10 + mod
-			self._labelList[i]:scroll(times, time)
-			time = time * 10
 		end
 	end
 end
 
--- function JNumberScroller:check()
--- 	self._curNum = self._curNum + 1
--- 	if (self._curNum + 1) % 10 == 0 then
--- 		self._labelList[#self._labelList - 1]:startScroll()
--- 	end
--- 	self:scrollTo(self._targetNum)
--- end
+function JNumberScroller:curNum(int)
+	if int then
+		if self._curNum ~= int then
+			self:scrollTo(int)
+		end
+		return self
+	end
+	return self._curNum
+end
 
 return JNumberScroller

@@ -66,8 +66,16 @@ function MainScene:ctor()
 
     ----[[
     self._numScroller = JNumberScroller.new():addToContainer():pos(display.cx, display.cy)
+    self._numScroller:curNum(258)
     libraUIManager:getUIContainer()._testBtn:onClicked(function ()
-        self._numScroller:scrollTo(265)
+        local ff = math.random(999)
+        print(ff)
+        self._numScroller:scrollTo(ff)
+    end)
+    libraUIManager:getUIContainer()._testBtn1:onClicked(function ()
+        local ff = math.random(999)
+        print(ff)
+        self._numScroller:scrollTo(ff, 54554)
     end)
     --]]
 end

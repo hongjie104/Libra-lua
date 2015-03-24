@@ -1,4 +1,3 @@
-
 require("config")
 require("cocos.init")
 require("framework.init")
