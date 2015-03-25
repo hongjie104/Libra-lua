@@ -7,21 +7,28 @@ local Button = require("libra.ui.components.JButton")
 
 local Toolbar = class("Toolbar", require("libra.ui.components.JContainer"))
 
-function Toolbar:ctor(onShowCreateUIPanel, onShowReferencePanel)
+function Toolbar:ctor(param)
 	Toolbar.super.ctor(self)
 	self:setSize(display.width, 66)
+
+	-- UI列表
+	Button.new({normal = "uiEditor/btn_normal.png", down = "uiEditor/btn_down.png", 
+		label = {text = "UI列表"}}, function ()
+			-- onShowCreateUIPanel()
+			param.showUIList()
+		end):addToContainer(self)
 
 	-- 新建按钮
 	Button.new({normal = "uiEditor/btn_normal.png", down = "uiEditor/btn_down.png", 
 		label = {text = "新建"}}, function ()
-			onShowCreateUIPanel()
+			-- onShowCreateUIPanel()
 		end):addToContainer(self)
 
 	-- 载入示意图按钮
 	Button.new({normal = "uiEditor/btn_normal.png", down = "uiEditor/btn_down.png", 
 		label = {text = "载入图"}}, function ()
 			-- onShowCreateUIPanel()
-			onShowReferencePanel()
+			-- onShowReferencePanel()
 		end):addToContainer(self)
 
 	self:setLayout(require("libra.ui.layout.BoxLayout").new(self._componentList))

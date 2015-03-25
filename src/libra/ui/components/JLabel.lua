@@ -4,6 +4,7 @@
 --
 
 local JLabel = class("JLabel", function (param)
+	assert(param, "JLabel:class() - invalid param:param is nil")
 	if param.isBMFont then
 		return display.newBMFontLabel(param)
 	else

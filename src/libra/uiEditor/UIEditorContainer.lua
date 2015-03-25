@@ -19,19 +19,19 @@ function UIEditorContainer:ctor()
 		end
 	end):addToContainer(self)
 
-	require("libra.uiEditor.Toolbar").new(
-		handler(self, self.showCreateUIPanel),
-		handler(self, self.ShowReferencePanel)
-		):addToContainer(self._layer):align(display.CENTER, display.cx, display.top - 36)
-end
-
-function UIEditorContainer:showCreateUIPanel()
-	require("libra.uiEditor.CreateUIPanel").new():show(self._layer)
-end
-
---- 打开选取参考图的面板
-function UIEditorContainer:ShowReferencePanel()
-	require("libra.uiEditor.ReferencePanel").new(handler(--[[self, self.showReferenceImg]])):show(self._layer)
+	require("libra.uiEditor.Toolbar").new({
+		showUIList = function ()
+			require("libra.uiEditor.UIListPanel").new(function (uiConfig)
+				require("libra.uiEditor.preview.UIPreviewPanel").new(uiConfig):show(self._layer)
+			end):show(self._layer)
+		end,
+		showCreateUIPanel = function ()
+			require("libra.uiEditor.CreateUIPanel").new():show(self._layer)
+		end,
+		showReferencePanel = function ()
+			require("libra.uiEditor.ReferencePanel").new():show(self._layer)
+		end
+		}):addToContainer(self._layer):align(display.CENTER, display.cx, display.top - 36)
 end
 
 return UIEditorContainer

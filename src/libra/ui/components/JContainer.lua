@@ -21,28 +21,38 @@ function JContainer:createUI(uiConfig)
 		if ui.id then
 			self[ui.id] = uiComponent
 		end
-	    for k, v in pairs(ui) do
-	        if k ~= "id" and k ~= 'ui' and k ~= 'param' then
-	            if type(uiComponent[k]) == "function" then
-	                if type(v) == "table" then
-	                	local l = #v
-	                    if l == 1 then
-	                        uiComponent[k](uiComponent, v[1])
-	                    elseif l == 2 then
-	                        uiComponent[k](uiComponent, v[1], v[2])
-	                    elseif l == 3 then
-	                        uiComponent[k](uiComponent, v[1], v[2], v[3])
-	                    elseif l == 4 then
-	                        uiComponent[k](uiComponent, v[1], v[2], v[3], v[4])
-	                    elseif l == 5 then
-	                        uiComponent[k](uiComponent, v[1], v[2], v[3], v[4], v[5])
-	                    end
-	                else
-	                    uiComponent[k](uiComponent, v)
-	                end
-	            end
-	        end
-	    end
+		for k, v in pairs(ui) do
+			if k ~= "id" and k ~= 'ui' and k ~= 'param' then
+				if type(uiComponent[k]) == "function" then
+					if type(v) == "table" then
+						local l = #v
+						if l == 1 then
+							uiComponent[k](uiComponent, v[1])
+						elseif l == 2 then
+							uiComponent[k](uiComponent, v[1], v[2])
+						elseif l == 3 then
+							uiComponent[k](uiComponent, v[1], v[2], v[3])
+						elseif l == 4 then
+							uiComponent[k](uiComponent, v[1], v[2], v[3], v[4])
+						elseif l == 5 then
+							uiComponent[k](uiComponent, v[1], v[2], v[3], v[4], v[5])
+						elseif l == 6 then
+							uiComponent[k](uiComponent, v[1], v[2], v[3], v[4], v[5], v[6])
+						elseif l == 7 then
+							uiComponent[k](uiComponent, v[1], v[2], v[3], v[4], v[5], v[6], v[7])
+						elseif l == 8 then
+							uiComponent[k](uiComponent, v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8])
+						elseif l == 9 then
+							uiComponent[k](uiComponent, v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9])
+						elseif l == 10 then
+							uiComponent[k](uiComponent, v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10])
+						end
+					else
+						uiComponent[k](uiComponent, v)
+					end
+				end
+			end
+		end
 	end
 end
 
