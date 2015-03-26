@@ -8,11 +8,12 @@ local JPanel = class("JPanel", require("libra.ui.components.JContainer"))
 -- @param param {bg="背景图", isScale9 = true}
 function JPanel:ctor(param)
 	JPanel.super.ctor(self, param)
-	-- 添加一个layer以吞噬掉触摸事件
-	display.newLayer():align(display.CENTER):addTo(self, -2)
+	-- 添加一个有色layer以吞噬掉触摸事件，顺带可以支持面板有一个全屏的背景色
+	local cc4b = param.bgColor or cc.c4b(0, 0, 0, 0)
+	self._bgLayer = display.newColorLayer(cc4b):pos((self._actualWidth - display.width) / 2, (self._actualHeight - display.height) / 2):addTo(self, -2)
+
 	self._isShowing = false
 	self:setNodeEventEnabled(true)
-	-- self:setAnchorPoint(display.ANCHOR_POINTS[display.CENTER])
 	self:align(display.CENTER, display.cx, display.cy)
 end
 
@@ -42,6 +43,13 @@ function JPanel:close()
 		end})
 	end
 	return self
+end
+
+function JPanel:setSize(width, height)
+	JPanel.super.setSize(self, width, height)
+	if self._bgLayer then
+		self._bgLayer:pos((self._actualWidth - display.width) / 2, (self._actualHeight - display.height) / 2)
+	end	
 end
 
 function JPanel:isShowing()

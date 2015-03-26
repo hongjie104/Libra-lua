@@ -9,8 +9,8 @@ local MsgPanel = require('libra.ui.components.JMsgPanel')
 local Toolbar = class("Toolbar", require("libra.ui.components.JContainer"))
 
 function Toolbar:ctor(param)
-	Toolbar.super.ctor(self)
-	self:setSize(display.width, 66)
+	param.width, param.height = display.width, 66
+	Toolbar.super.ctor(self, param)
 
 	-- UI列表
 	Button.new({normal = "uiEditor/btn_normal.png", down = "uiEditor/btn_down.png", 

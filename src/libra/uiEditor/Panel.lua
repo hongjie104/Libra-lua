@@ -8,8 +8,7 @@ local Button = require('libra.ui.components.JButton')
 local Panel = class("Panel", require("libra.ui.components.JPanel"))
 
 function Panel:ctor(width, height)
-	Panel.super.ctor(self, {bg = "uiEditor/panel_bg.png", isScale9 = true})
-	self:setSize(width, height)
+	Panel.super.ctor(self, {bg = "uiEditor/panel_bg.png", isScale9 = true, width = width, height = height})
 
 	Button.new({normal = "uiEditor/closeBtn_normal.png", down = 'uiEditor/closeBtn_down.png'}, function ()
 		self:close()
