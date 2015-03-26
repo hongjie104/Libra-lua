@@ -37,8 +37,9 @@ local function showBorder(self)
 	if self._border then
 		self._border:setVisible(true)
 	else
-		self._border = display.newRect(cc.rect(self._actualWidth / -2, self._actualHeight / -2, self._actualWidth, self._actualHeight), 
-			{borderColor = cc.c4f(0,1,0,1)}):addTo(self)
+		-- self._border = display.newRect(cc.rect(self._actualWidth / -2, self._actualHeight / -2, self._actualWidth, self._actualHeight), 
+		-- 	{borderColor = cc.c4f(0,1,0,1)}):addTo(self)
+		self._border = display.newScale9Sprite("uiEditor/border.png", 0, 0, self:getContentSize()):addTo(self)
 	end
 	return self
 end

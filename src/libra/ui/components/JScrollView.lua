@@ -235,9 +235,10 @@ end
 -- 是否显示到边缘
 function JScrollView:isSideShow()
 	local bound = self:getScrollNodeRect()
-	return bound.x > self._viewRect.x or bound.y > self._viewRect.y
-		or self._viewRect.x + self._viewRect.width > bound.x + bound.width 
-		or self._viewRect.y + self._viewRect.height > bound.y + bound.height
+	local viewRect = self:getViewRectInWorldSpace()
+	return bound.x > viewRect.x or bound.y > viewRect.y
+		or viewRect.x + viewRect.width > bound.x + bound.width 
+		or viewRect.y + viewRect.height > bound.y + bound.height
 end
 
 function JScrollView:getScrollNodeRect()

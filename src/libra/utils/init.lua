@@ -16,7 +16,8 @@ end
 --- 判断当前是否存在多语言文件
 local langFile = "res/lang/" .. LANG .. ".mo"
 if cc.FileUtils:getInstance():isFileExist(langFile) then
-	__ = assert(require("framework.cc.utils.Gettext").gettextFromFile(langFile))
+	__ = assert(require("framework.cc.utils.Gettext").gettextFromFile(langFile), 
+			string.format("framework.cc.utils.Gettext gettextFromFile(%s) return nil", langFile))
 end
 
 function _(text, ...)
@@ -86,11 +87,11 @@ function sceneOnEnter(scene)
 
 	-- 添加UI层
 	libraUIManager:getUIContainer():addTo(scene)
-    if LUA_UI_EDITOR then
-        import("libra.uiEditor.UIEditorContainer").new():addToContainer()
-    end
+	if LUA_UI_EDITOR then
+		import("libra.uiEditor.UIEditorContainer").new():addToContainer()
+	end
 
-    if device.platform == "android" then
+	if device.platform == "android" then
 		-- avoid unmeant back
 		scene:performWithDelay(function()
 			-- keypad layer, for android
@@ -121,6 +122,8 @@ function sceneOnExit(scene)
 	-- end
 end
 
+--===========================================================================================
+
 function getStringLength(str)
 	if str == "" then
 		return 0
@@ -150,26 +153,9 @@ function getStringLength(str)
 	return #indexList
 end
 
---- 从 package.path 中查找指定模块的文件名，如果失败返回 false。
--- @param string moduleName
--- @return string
--- function findModulePath(moduleName)
---     local filename = string.gsub(moduleName, "%.", "/") .. ".lua"
---     local paths = string.split(package.path, ";")
---     for i, path in ipairs(paths) do
---         if string.sub(path, -5) == "?.lua" then
---             path = string.sub(path, 1, -6)
---             if not string.find(path, "?", 1, true) then
---                 local fullpath = path .. filename
---                 if io.exists(fullpath) then
---                     return fullpath
---                 end
---             end
---         end
---     end
---     return false
--- end
+--===========================================================================================
 
+--- 从 package.path 中查找指定模块的文件名，如果失败返回 nil
 function findModulePath(moduleName)
 	for k, v in pairs(package.loaded) do
 		if string.find(k, moduleName) then
@@ -178,31 +164,96 @@ function findModulePath(moduleName)
 	end
 end
 
+--- 获取目标目录下所有的文件列表
 function getpathes(rootpath, pathes)
 	require "lfs"
-    local pathes = pathes or { }
-    local ret, files, iter = pcall(lfs.dir, rootpath)
-    if not ret then
-        return pathes
-    end
-    for entry in files, iter do
-        local next = false
-        if entry ~= '.' and entry ~= '..' then
-            local path = rootpath .. '/' .. entry
-            local attr = lfs.attributes(path)
-            if attr == nil then
-                next = true
-            end
+	local pathes = pathes or { }
+	local ret, files, iter = pcall(lfs.dir, rootpath)
+	if not ret then
+		return pathes
+	end
+	for entry in files, iter do
+		local next = false
+		if entry ~= '.' and entry ~= '..' then
+			local path = rootpath .. '/' .. entry
+			local attr = lfs.attributes(path)
+			if attr == nil then
+				next = true
+			end
 
-            if next == false then 
-                if attr.mode == 'directory' then
-                    getpathes(path, pathes)
-                else
-                    table.insert(pathes, path)
-                end
-            end
-        end
-        next = false
-    end
-    return pathes
+			if next == false then 
+				if attr.mode == 'directory' then
+					getpathes(path, pathes)
+				else
+					table.insert(pathes, path)
+				end
+			end
+		end
+		next = false
+	end
+	return pathes
+end
+
+--===========================================================================================
+
+--- 序列化一个对象
+function serialize(obj)
+	local lua = ""
+	local t = type(obj)
+	if t == "number" then
+		lua = lua .. obj
+	elseif t == "boolean" then
+		lua = lua .. tostring(obj)
+	elseif t == "string" then
+		lua = lua .. string.format("%q", obj)
+	elseif t == "table" then
+		lua = lua .. "{"
+		local key = nil
+		for k, v in pairs(obj) do
+			if type(k) == "table" then
+				key = serialize(k)
+			else
+				key = k
+			end
+			if type(key) == "number" then
+				lua = lua .. serialize(v) .. ","
+			else
+				lua = lua .. key .. "=" .. serialize(v) .. ","
+			end
+		end
+		-- 去掉最后一个逗号
+		if string.sub(lua, -1) == ',' then
+			lua = string.sub(lua, 1, -2)
+		end
+		local metatable = getmetatable(obj)
+		if metatable ~= nil and type(metatable.__index) == "table" then
+			for k, v in pairs(metatable.__index) do
+				lua = lua .. "[" .. serialize(k) .. "]=" .. serialize(v) .. ",\n"
+			end
+		end
+		lua = lua .. "}"
+	elseif t == "nil" then
+		return nil
+	else
+		error("can not serialize a " .. t .. " type.")
+	end
+	return lua
+end
+
+--- 反序列化一个对象
+function unserialize(lua)
+	local t = type(lua)
+	if t == "nil" or lua == "" then
+		return nil
+	elseif t == "number" or t == "string" or t == "boolean" then
+		lua = tostring(lua)
+	else
+		error("can not unserialize a " .. t .. " type.")
+	end
+	lua = "return " .. lua
+	local func = loadstring(lua)
+	if func == nil then
+		return nil
+	end
+	return func()
 end

@@ -7,9 +7,9 @@ local JMsgPanel = class("JMsgPanel", function (param)
 	assert(param, "JMsgPanel:class() - invalid param:param is nil")
 	if param.isScale9 then
 		param.imgSize = param.imgSize or cc.size(400, 300)
-		return display.newScale9Sprite(param.img, param.x or display.cx, param.y or display.cy, param.imgSize, param.capInsets)
+		return display.newScale9Sprite(param.img, param.x, param.y, param.imgSize, param.capInsets)
 	else
-		return display.newSprite(param.img, param.x or display.cx, param.y or display.cy)
+		return display.newSprite(param.img, param.x, param.y)
 	end
 end)
 

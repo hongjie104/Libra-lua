@@ -11,8 +11,8 @@ function UIPreviewPanel:ctor(uiConfig)
 	self._bg:removeSelf()
 	self._bg = display.newColorLayer(cc.c4b(0, 0, 0, 255)):addTo(self, -1)
 
-	self:createUI(uiConfig)
-	for i, v in ipairs(uiConfig) do
+	self:createUI(uiConfig.uiConfig)
+	for i, v in ipairs(uiConfig.uiConfig) do
 		self[v.id]:setTouchEnabled(true)
 		self[v.id]:addNodeEventListener(cc.NODE_TOUCH_EVENT, function (event)
 			if event.name == "began" then

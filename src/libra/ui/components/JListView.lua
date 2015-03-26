@@ -12,7 +12,7 @@ function JListView:ctor(param)
 
 	self._direction = param.direction or Direction.VERTICAL
 	self._itemList = { }
-	-- self._containerSize = {width = 0, height = 0}
+
 	self._freeItemList = { }
 	self._redundancyViewVal = 0 --异步的视图两个方向上的冗余大小,横向代表宽,竖向代表高
 
@@ -51,6 +51,24 @@ function JListView:getItemPos(listItem)
 			return i
 		end
 	end
+end
+
+function JListView:isItemInViewRect(pos)
+	local item
+	if "number" == type(pos) then
+		item = self.items_[pos]
+	elseif "userdata" == type(pos) then
+		item = pos
+	end
+
+	if not item then return end
+	
+	local bound = item:getBoundingBox()
+	local nodePoint = self.container:convertToWorldSpace(cc.p(bound.x, bound.y))
+	bound.x = nodePoint.x
+	bound.y = nodePoint.y
+
+	return cc.rectIntersectsRect(self:getViewRectInWorldSpace(), bound)
 end
 
 --- 加载列表
@@ -166,6 +184,7 @@ function JListView:getContainerCascadeBoundingBox()
 	local point = self._container:convertToWorldSpace(cc.p(boundingBox.x, boundingBox.y))
 	boundingBox.x = point.x
 	boundingBox.y = point.y
+
 	return boundingBox
 end
 
@@ -178,11 +197,12 @@ function JListView:increaseOrReduceItem()
 	local nNeedAdjust = 2 
 	local cascadeBound = self:getContainerCascadeBoundingBox()
 	local item, itemW, itemH
+	local viewRect = self:getViewRectInWorldSpace()
 	if Direction.VERTICAL == self._direction then
-		--ahead part of view
+		-- ahead part of view
 		item = self._itemList[1]
 		if not item then return end
-		local disH = cascadeBound.y + cascadeBound.height - self._viewRect.y - self._viewRect.height
+		local disH = cascadeBound.y + cascadeBound.height - viewRect.y - viewRect.height
 		local tempIdx = item:index()
 		if disH > self._redundancyViewVal then
 			itemW, itemH = item:actualWidth(), item:actualHeight()
@@ -204,15 +224,15 @@ function JListView:increaseOrReduceItem()
 			end
 		end
 
-		--part after view
-		disH = self._viewRect.y - cascadeBound.y
+		-- part after view
+		disH = viewRect.y - cascadeBound.y
 		item = self._itemList[#self._itemList]
 		if not item then return end
 
 		tempIdx = item:index()
 		if disH > self._redundancyViewVal then
 			itemW, itemH = item:actualWidth(), item:actualHeight()
-			if cascadeBound.height - itemH > self._viewRect.height
+			if cascadeBound.height - itemH > viewRect.height
 				and disH - itemH > self._redundancyViewVal then
 				self:unloadOneItem(tempIdx)
 			else
@@ -230,13 +250,13 @@ function JListView:increaseOrReduceItem()
 			end
 		end
 	else
-		--left part of view
-		local disW = self._viewRect.x - cascadeBound.x
+		-- left part of view
+		local disW = viewRect.x - cascadeBound.x
 		item = self._itemList[1]
 		local tempIdx = item:index()
 		if disW > self._redundancyViewVal then
 			itemW, itemH = item:actualWidth(), item:actualHeight()
-			if cascadeBound.width - itemW > self._viewRect.width
+			if cascadeBound.width - itemW > viewRect.width
 				and disW - itemW > self._redundancyViewVal then
 				self:unloadOneItem(tempIdx)
 			else
@@ -254,13 +274,13 @@ function JListView:increaseOrReduceItem()
 			end
 		end
 
-		--right part of view
-		disW = cascadeBound.x + cascadeBound.width - self._viewRect.x - self._viewRect.width
+		-- right part of view
+		disW = cascadeBound.x + cascadeBound.width - viewRect.x - viewRect.width
 		item = self._itemList[#self._itemList]
 		tempIdx = item:index()
 		if disW > self._redundancyViewVal then
 			itemW, itemH = item:actualWidth(), item:actualHeight()
-			if cascadeBound.width - itemW > self._viewRect.width
+			if cascadeBound.width - itemW > viewRect.width
 				and disW - itemW > self._redundancyViewVal then
 				self:unloadOneItem(tempIdx)
 			else
@@ -347,7 +367,6 @@ end
 function JListView:loadOneItem(originPoint, idx, bBefore)
 	local item, itemW, itemH, containerW, containerH = nil, 0, 0, 0, 0
 	local posX, posY = originPoint.x, originPoint.y
-	local content = nil
 	item = self._delegateFunc(self, TAG.CELL_TAG, idx)
 	if nil == item then
 		logger:error("ERROR! JListView load nil item")
@@ -355,22 +374,21 @@ function JListView:loadOneItem(originPoint, idx, bBefore)
 	end
 	item:index(idx)
 	itemW, itemH = item:actualWidth(), item:actualHeight()
+	itemW = itemW or 0
+	itemH = itemH or 0
 	if Direction.VERTICAL == self._direction then
-		itemW = itemW or 0
-		itemH = itemH or 0
 		posY = bBefore and posY or posY - itemH
 		item:setPosition(0, posY)
+		-- transition.moveTo(item, {time = .05 * idx, x = 0, y = posY})
 		containerH = containerH + itemH
 	else
-		itemW = itemW or 0
-		itemH = itemH or 0
 		if bBefore then
 			posX = posX - itemW
 		end
 		item:setPosition(posX, 0)
 		containerW = containerW + itemW
 	end
-	content = item:getContent()
+	local content = item:getContent()
 	content:setAnchorPoint(0.5, 0.5)
 	content:setPosition(itemW / 2, itemH / 2)
 
@@ -432,48 +450,15 @@ function JListView:onScrollHandler(event)
 	if "clicked" == event.name then
 		local nodePoint = self._container:convertToNodeSpace(cc.p(event.x, event.y))
 		local pos, idx = 0, 0
-		if true then
-			local itemRect = nil
-			for i, v in ipairs(self._itemList) do
-				local posX, posY = v:getPosition()
-				local itemW, itemH = v:actualWidth(), v:actualHeight()
-				itemRect = cc.rect(posX, posY, itemW, itemH)
-				if cc.rectContainsPoint(itemRect, nodePoint) then
-					pos, idx = i, v:index()
-					break
-				end
+		local itemRect = nil
+		for i, v in ipairs(self._itemList) do
+			local posX, posY = v:getPosition()
+			local itemW, itemH = v:actualWidth(), v:actualHeight()
+			itemRect = cc.rect(posX, posY, itemW, itemH)
+			if cc.rectContainsPoint(itemRect, nodePoint) then
+				pos, idx = i, v:index()
+				break
 			end
-		--[[else
-			nodePoint.x = nodePoint.x - self._viewRect.x
-			nodePoint.y = nodePoint.y - self._viewRect.y
-
-			local width, height = 0, self.size.height
-			local itemW, itemH = 0, 0
-
-			if Direction.VERTICAL == self._direction then
-				for i,v in ipairs(self._itemList) do
-					itemW, itemH = v:actualWidth(), v:actualHeight()
-
-					if nodePoint.y < height and nodePoint.y > height - itemH then
-						pos = i
-						idx = pos
-						nodePoint.y = nodePoint.y - (height - itemH)
-						break
-					end
-					height = height - itemH
-				end
-			else
-				for i,v in ipairs(self._itemList) do
-					itemW, itemH = v:actualWidth(), v:actualHeight()
-
-					if nodePoint.x > width and nodePoint.x < width + itemW then
-						pos = i
-						idx = pos
-						break
-					end
-					width = width + itemW
-				end
-			end]]
 		end
 		self:notifyListener{name = event.name, listView = self, itemPos = idx, item = self._itemList[pos], point = nodePoint}
 	else

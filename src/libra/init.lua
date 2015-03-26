@@ -18,8 +18,6 @@ if LUA_UI_EDITOR then
 	import(".uiEditor.init")
 end
 
-logger = import(".log4q.Logger")
-
 -- 扩展一下Node
 local Node = cc.Node
 

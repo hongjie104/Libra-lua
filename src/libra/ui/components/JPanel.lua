@@ -9,11 +9,8 @@ local JPanel = class("JPanel", require("libra.ui.components.JContainer"))
 function JPanel:ctor(param)
 	JPanel.super.ctor(self, param)
 	-- 添加一个layer以吞噬掉触摸事件
-	display.newLayer():align(display.CENTER, display.cx, display.cy):addTo(self, -2)
-
+	display.newLayer():align(display.CENTER):addTo(self, -2)
 	self._isShowing = false
-
-	self:addNodeEventListener(cc.NODE_ENTER_FRAME_EVENT, handler(self, self.onUpdate))
 	self:setNodeEventEnabled(true)
 end
 
@@ -21,7 +18,8 @@ function JPanel:show(container)
 	if not self._isShowing then
 		self:addToContainer(container)
 		self._isShowing = true
-		self:scaleToShow()
+		self:scale(.2)
+		transition.scaleTo(self, {time = .3, scale = 1, easing = "BACKOUT"})
 	end
 	return self
 end
@@ -29,34 +27,21 @@ end
 function JPanel:close()
 	if self._isShowing then
 		self._isShowing = false
-		self:removeSelf()
+		-- 之所以在关闭前把所有组件都unscheduleUpdate一下
+		-- 是因为JListView控件在父容器的scale不为1时，其onUpdate方法会导致崩溃。。。
+		-- 所以关闭onUpdate，然后再改变面板大小
+		for _, v in ipairs(self._componentList) do
+			v:unscheduleUpdate()
+		end
+		transition.scaleTo(self, {time = .2, scale = .5, easing = "BACKIN", onComplete = function ()
+			self:removeSelf()
+		end})
 	end
 	return self
 end
 
 function JPanel:isShowing()
 	return self._isShowing
-end
-
-function JPanel:scaleToShow()
-	self._curScale = .2
-	self:setScaleToKeepCenter(self._curScale)
-	self:scheduleUpdate()
-end
-
-function JPanel:setScaleToKeepCenter(val)
-	self:scale(val)
-	self:setPosition(display.cx - display.cx * val, display.cy - display.cy * val)
-end
-
-function JPanel:onUpdate(dt)
-	self._curScale = self._curScale + .05
-	self:setScaleToKeepCenter(self._curScale)
-	if self._curScale >= 0.9 then
-		self._curScale = 1
-		self:setScaleToKeepCenter(self._curScale)
-		self:unscheduleUpdate()
-	end
 end
 
 function JPanel:onEnter()

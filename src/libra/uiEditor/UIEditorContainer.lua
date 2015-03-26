@@ -23,7 +23,7 @@ function UIEditorContainer:ctor()
 		showUIList = function ()
 			require("libra.uiEditor.UIListPanel").new(function (uiConfig)
 				require("libra.uiEditor.preview.UIPreviewPanel").new(uiConfig):show(self._layer)
-			end):show(self._layer)
+			end):show(self._layer):pos(display.cx, display.cy)
 		end,
 		showCreateUIPanel = function ()
 			require("libra.uiEditor.CreateUIPanel").new():show(self._layer)
@@ -31,7 +31,7 @@ function UIEditorContainer:ctor()
 		showReferencePanel = function ()
 			require("libra.uiEditor.ReferencePanel").new():show(self._layer)
 		end
-		}):addToContainer(self._layer):align(display.CENTER, display.cx, display.top - 36)
+		}):addToContainer(self._layer):align(display.TOP_LEFT, display.left, display.top)
 end
 
 return UIEditorContainer

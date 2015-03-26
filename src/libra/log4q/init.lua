@@ -3,6 +3,8 @@
 -- Date: 2015-03-13 10:27:56
 --
 
+logger = import(".Logger")
+
 -- DEBUG:用来debug的信息
 -- INFO:有用或者无用的信息
 -- WARN:警告
