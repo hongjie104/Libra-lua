@@ -88,7 +88,7 @@ end
 function JContainer:addComponent(component, zOrder)
 	if not table.indexof(self._componentList, component) then
 		self:addChild(component)
-		if zOrder then
+		if type(zOrder) == "number" then
 			component:setLocalZOrder(zOrder)
 		end
 		self._componentList[#self._componentList + 1] = component

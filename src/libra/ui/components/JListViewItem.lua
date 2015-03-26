@@ -27,4 +27,12 @@ function JListViewItem:index(int)
 	return self._index
 end
 
+-- function JListViewItem:onTouchBegan()
+-- 	-- body
+-- end
+
+-- function JListViewItem:onTouchEnded()
+-- 	-- body
+-- end
+
 return JListViewItem
