@@ -13,7 +13,7 @@ function Panel:ctor(width, height)
 
 	Button.new({normal = "uiEditor/closeBtn_normal.png", down = 'uiEditor/closeBtn_down.png'}, function ()
 		self:close()
-	end):align(display.RIGHT_TOP, self._actualWidth / 2, self._actualHeight / 2):addToContainer(self)
+	end):align(display.RIGHT_TOP, width, height):addToContainer(self)
 end
 
 return Panel

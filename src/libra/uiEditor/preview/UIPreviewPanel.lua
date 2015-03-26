@@ -9,7 +9,7 @@ function UIPreviewPanel:ctor(uiConfig)
 	UIPreviewPanel.super.ctor(self, display.width, display.height)
 	-- 创建一个纯黑色的背景
 	self._bg:removeSelf()
-	self._bg = display.newColorLayer(cc.c4b(0, 0, 0, 255)):addTo(self, -1)
+	self._bg = display.newColorLayer(cc.c4b(0, 0, 0, 255)):pos(-display.cx, -display.cy):addTo(self, -1)
 
 	self:createUI(uiConfig.uiConfig)
 	for i, v in ipairs(uiConfig.uiConfig) do

@@ -13,15 +13,8 @@ local UIListPanel = class("UIListPanel", require("libra.uiEditor.Panel"))
 
 function UIListPanel:ctor(showUIPreviewPanel)
 	UIListPanel.super.ctor(self, 600, 400)
-	-- UIListPanel.super.ctor(self, display.width, display.height)
 
-	-- self:setContentSize(display.width, display.height)
-	-- self:align(display.CENTER)
-	-- dump(self:getAnchorPoint())
-	-- dump(self:getContentSize())
-	-- self:setScale(.5)
-
-	local listViewRect = cc.rect(self._actualWidth / -2 + 10, self._actualHeight / -2 + 10, 160, self._actualHeight - 50)
+	local listViewRect = cc.rect(10, 10, 160, self._actualHeight - 50)
 	Label.new({text = "UI列表"}):align(display.CENTER_BOTTOM, listViewRect.x + listViewRect.width / 2, listViewRect.y + listViewRect.height):addToContainer(self)
 	local listView = ListView.new({
 		viewRect = listViewRect,
@@ -45,37 +38,37 @@ function UIListPanel:ctor(showUIPreviewPanel)
 			showUIPreviewPanel(UI_CONFIG[self._uiIndex])
 			self:close()
 		else
-			MsgPanel.new({isScale9 = true, img = "uiEditor/scale9_darkBrown.png", imgSize = cc.size(200, 100), text = "请选择一个UI先"}):show(self)
+			MsgPanel.new({isScale9 = true, img = "uiEditor/scale9_darkBrown.png", imgSize = cc.size(200, 100), text = "请选择一个UI先"}):show()
 		end
-	end):align(display.TOP_CENTER, 0, self._uiName:y() - 100):addToContainer(self)
+	end):align(display.TOP_CENTER, 300, self._uiName:y() - 100):addToContainer(self)
 
 	Button.new({normal = "btnRed2_normal.png", down = "btnRed2_down.png", label = {text = "新建"}}, function ()
 		local uiName = self._uiName:getString()
 		if uiName == '' then
-			MsgPanel.new({isScale9 = true, img = "uiEditor/scale9_darkBrown.png", imgSize = cc.size(200, 100), text = '输入UI名字先'}):show(self)
+			MsgPanel.new({isScale9 = true, img = "uiEditor/scale9_darkBrown.png", imgSize = cc.size(200, 100), text = '输入UI名字先'}):show()
 		else
 			for _, v in ipairs(UI_CONFIG) do
 				if v.name == uiName then
-					MsgPanel.new({isScale9 = true, img = "uiEditor/scale9_darkBrown.png", imgSize = cc.size(400, 100), text = string.format('已存在名字为%s的UI了', uiName)}):show(self)
+					MsgPanel.new({isScale9 = true, img = "uiEditor/scale9_darkBrown.png", imgSize = cc.size(400, 100), text = string.format('已存在名字为%s的UI了', uiName)}):show()
 					return
 				end
 			end
 			local uiID = self._uiID:getString()
 			if uiID == '' then
-				MsgPanel.new({isScale9 = true, img = "uiEditor/scale9_darkBrown.png", imgSize = cc.size(200, 100), text = '输入UI ID先'}):show(self)
+				MsgPanel.new({isScale9 = true, img = "uiEditor/scale9_darkBrown.png", imgSize = cc.size(200, 100), text = '输入UI ID先'}):show()
 			else
 				for _, v in ipairs(UI_CONFIG) do
 					if v.id == uiID then
-						MsgPanel.new({isScale9 = true, img = "uiEditor/scale9_darkBrown.png", imgSize = cc.size(400, 100), text = string.format('已存在ID为%s的UI了', uiID)}):show(self)
+						MsgPanel.new({isScale9 = true, img = "uiEditor/scale9_darkBrown.png", imgSize = cc.size(400, 100), text = string.format('已存在ID为%s的UI了', uiID)}):show()
 						return
 					end
 				end
 			end
 			UI_CONFIG[#UI_CONFIG + 1] = {id = uiID, name = uiName, uiConfig = { }}
 			listView:reload()
-			MsgPanel.new({isScale9 = true, img = "uiEditor/scale9_darkBrown.png", imgSize = cc.size(300, 100), text = string.format('添加%s成功', uiName)}):show(self)
+			MsgPanel.new({isScale9 = true, img = "uiEditor/scale9_darkBrown.png", imgSize = cc.size(300, 100), text = string.format('添加%s成功', uiName)}):show()
 		end
-	end):align(display.TOP_CENTER, 130, self._uiName:y() - 100):addToContainer(self)
+	end):align(display.TOP_CENTER, 430, self._uiName:y() - 100):addToContainer(self)
 
 	self._uiIndex = 0
 end

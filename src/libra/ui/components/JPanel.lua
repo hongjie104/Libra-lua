@@ -12,6 +12,8 @@ function JPanel:ctor(param)
 	display.newLayer():align(display.CENTER):addTo(self, -2)
 	self._isShowing = false
 	self:setNodeEventEnabled(true)
+	-- self:setAnchorPoint(display.ANCHOR_POINTS[display.CENTER])
+	self:align(display.CENTER, display.cx, display.cy)
 end
 
 function JPanel:show(container)
@@ -31,7 +33,9 @@ function JPanel:close()
 		-- 是因为JListView控件在父容器的scale不为1时，其onUpdate方法会导致崩溃。。。
 		-- 所以关闭onUpdate，然后再改变面板大小
 		for _, v in ipairs(self._componentList) do
-			v:unscheduleUpdate()
+			if v.unscheduleUpdate then
+				v:unscheduleUpdate()
+			end
 		end
 		transition.scaleTo(self, {time = .2, scale = .5, easing = "BACKIN", onComplete = function ()
 			self:removeSelf()

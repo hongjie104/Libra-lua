@@ -22,8 +22,8 @@ function UIEditorContainer:ctor()
 	require("libra.uiEditor.Toolbar").new({
 		showUIList = function ()
 			require("libra.uiEditor.UIListPanel").new(function (uiConfig)
-				require("libra.uiEditor.preview.UIPreviewPanel").new(uiConfig):show(self._layer)
-			end):show(self._layer):pos(display.cx, display.cy)
+				require("libra.uiEditor.preview.UIPreviewPanel").new(uiConfig):pos(display.cx, display.cy):show(self._layer)
+			end):show(self._layer)
 		end,
 		showCreateUIPanel = function ()
 			require("libra.uiEditor.CreateUIPanel").new():show(self._layer)

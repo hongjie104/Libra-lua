@@ -66,10 +66,10 @@ function JContainer:setSize(width, height)
 		else
 			if self._param.isScale9 then
 				-- self._bg = display.newScale9Sprite(self._param.bg, display.cx, display.cy, cc.size(width, height)):addTo(self, -1)
-				self._bg = display.newScale9Sprite(self._param.bg, 0, 0, cc.size(width, height)):addTo(self, -1)
+				self._bg = display.newScale9Sprite(self._param.bg, width / 2, height / 2, cc.size(width, height)):addTo(self, -1):align(display.CENTER)
 			else
-				-- self._bg = display.newSprite(self._param.bg):addTo(self, -1):pos(display.cx, display.cy)
-				self._bg = display.newSprite(self._param.bg):addTo(self, -1)
+				self._bg = display.newSprite(self._param.bg):addTo(self, -1):pos(display.cx, display.cy)
+				-- self._bg = display.newSprite(self._param.bg):addTo(self, -1)
 			end
 		end
 	end

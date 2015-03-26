@@ -24,7 +24,9 @@ end
 
 function JMsgPanel:show(container)
 	if not self._isShowing then
-		self:addToContainer(container)
+		container = container or libraUIManager:getUIContainer()
+		local size = container:getContentSize()
+		self:pos(size.width / 2, size.height / 2):addToContainer(container)
 		self._isShowing = true
 		self:performWithDelay(function ()
 			self:removeSelf()
