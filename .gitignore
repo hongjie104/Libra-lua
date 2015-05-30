@@ -6,3 +6,5 @@
 /libra.sublime-project
 /src/cocos
 /src/framework
+*.sublime-project
+*.sublime-workspace
