@@ -4,6 +4,8 @@
 -- Date: 2015-03-20 10:25:49
 --
 
+DATA_CONFIG_PACKAGE = DATA_CONFIG_PACKAGE or "app.config."
+
 import(".lang")
 
 --===========================================================================================
@@ -43,7 +45,7 @@ end
 -- @return 返回配置文件中物品的配置信息
 function getConfig(propType, configType, compareStr)
 	compareStr = compareStr and compareStr or 'ID'
-	local config = require('app.config.' .. configType)
+	local config = require(DATA_CONFIG_PACKAGE .. configType)
 	if config then
 		return queryByType(config, compareStr, checkint(propType))
 	end

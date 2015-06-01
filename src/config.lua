@@ -15,7 +15,7 @@ LOAD_DEPRECATED_API = false
 LOAD_SHORTCODES_API = true
 
 -- screen orientation
-CONFIG_SCREEN_ORIENTATION = "Landscape"
+CONFIG_SCREEN_ORIENTATION = "landscape"
 
 -- design resolution
 CONFIG_SCREEN_WIDTH  = 960
@@ -27,3 +27,5 @@ CONFIG_SCREEN_AUTOSCALE = "FIXED_WIDTH"
 LUA_UPDATE = true
 
 LUA_UI_EDITOR = true
+
+DATA_CONFIG_PACKAGE = "libra.data.config."

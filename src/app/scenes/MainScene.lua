@@ -78,6 +78,20 @@ function MainScene:ctor()
 		self._numScroller:scrollTo(ff, 54554)
 	end)
 	--]]
+
+
+	-- local data = require("libra.data.Object").new()
+	local dataManager = require("libra.data.managers.ItemManager").new()
+	local data = dataManager:addData(1, 2)
+	dataManager:updateData(20, {name = "asd", des = "123"})
+
+	dataManager:addEventListener("testEvent", function ()
+		print("aaa")
+	end)
+
+	dataManager:dispatchEvent({name = 'testEvent'})
+
+	print(data:cfg().Func)
 end
 
 --[[

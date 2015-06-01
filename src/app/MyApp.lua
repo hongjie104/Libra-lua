@@ -1,5 +1,5 @@
 require("config")
-require("cocos.init")
+-- require("cocos.init")
 require("framework.init")
 require("libra.init")
 
