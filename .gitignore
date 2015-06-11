@@ -8,3 +8,4 @@
 /src/framework
 *.sublime-project
 *.sublime-workspace
+/debug.log
