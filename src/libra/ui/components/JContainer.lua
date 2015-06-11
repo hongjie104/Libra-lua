@@ -96,7 +96,7 @@ function JContainer:addComponent(component, zOrder)
 end
 
 function JContainer:getComponent(name)
-	if name and name == '' then
+	if name and name ~= '' then
 		for _, v in ipairs(self._componentList) do
 			if v:name() == name then return v end
 		end

@@ -23,12 +23,10 @@ end)
 --- 构造函数
 -- @param param {normmal = "按钮正常状态时图片", down = "按钮按下状态图片", unabled = "按钮不可用状态图片",  label = {text = "按钮文字", size = 24}}
 -- scale9 = ccsize 如果有值,说明是九宫图, capInsets = CCRect,
--- @param functions {onTouchBegan = 按下时的回调, onTouchMoved = 触摸移动时的回调, onTouchEnded = 触摸结束时的回调}
-function JButton:ctor(param, onClicked, functions)
+function JButton:ctor(param)
 	self._param = param
-	self._onClicked = onClicked
-	self._functions = functions
 	makeUIComponent(self)
+	cc(self):addComponent("components.behavior.EventProtocol"):exportMethods()
 
 	if param.scale9 then
 		self._scale9 = createScale9Sprite(param.normal, param.scale9, param.capInsets):addTo(self)
@@ -67,24 +65,9 @@ function JButton:enabled(bool)
 	return self._enabled
 end
 
---- 设置点击事件
-function JButton:onClicked(fun)
-	self._onClicked = fun
-end
-
---- 设置触摸事件
--- @param funs {onTouchBegan = fun, onTouchMoved = fun, onTouchEnded = fun}
-function JButton:functions(funs)
-	self._functions = funs
-end
-
 --- 触发点击事件
 function JButton:doClick()
-	if self._onClicked then
-		if type(self._onClicked) == "function" then
-			self._onClicked(self)
-		end
-	end
+	self:dispatchEvent({name = BUTTON_EVENT.CLICKED})
 end
 
 function JButton:alignLabel(align, x, y)
@@ -139,27 +122,15 @@ function JButton:onTouch(evt)
 end
 
 function JButton:onTouchBegan(evt)
-	if self._functions and self._functions.onTouchBegan then
-		if type(self._functions.onTouchBegan) == "function" then
-			self._functions.onTouchBegan(self, evt)
-		end
-	end
+	self:dispatchEvent({name = BUTTON_EVENT.TOUCH_BEGAN})
 end
 
 function JButton:onTouchMoved(evt)
-	if self._functions and self._functions.onTouchMoved then
-		if type(self._functions.onTouchMoved) == "function" then
-			self._functions.onTouchMoved(self, evt)
-		end
-	end
+	self:dispatchEvent({name = BUTTON_EVENT.TOUCH_MOVED})
 end
 
 function JButton:onTouchEnded(evt)
-	if self._functions and self._functions.onTouchEnded then
-		if type(self._functions.onTouchEnded) == "function" then
-			self._functions.onTouchEnded(self, evt)
-		end
-	end
+	self:dispatchEvent({name = BUTTON_EVENT.TOUCH_ENDED})
 end
 
 return JButton

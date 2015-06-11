@@ -3,8 +3,9 @@
 -- Date: 2015-03-12 20:45:32
 --
 
-import(".utils.init")
 import(".ui.init")
+-- import(".data.init")
+import(".utils.init")
 import(".log4q.init")
 
 if LUA_UPDATE then 

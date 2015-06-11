@@ -235,8 +235,7 @@ function unserialize(lua)
 	end
 	lua = "return " .. lua
 	local func = loadstring(lua)
-	if func == nil then
-		return nil
+	if func then
+		return func()
 	end
-	return func()
 end

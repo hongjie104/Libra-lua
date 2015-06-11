@@ -80,6 +80,8 @@ function makeUIComponent(component)
     component.addToContainer = addToContainer
 end
 
+import(".event")
+
 Direction = {
 	BOTH = 0,
 	VERTICAL = 1,
