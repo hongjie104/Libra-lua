@@ -1,5 +1,4 @@
 require("config")
--- require("cocos.init")
 require("framework.init")
 require("libra.init")
 
@@ -11,7 +10,6 @@ end
 
 function MyApp:run()	
 	self:enterScene("MainScene")
-	-- self:enterScene("login.LoginScene")
 end
 
 return MyApp
