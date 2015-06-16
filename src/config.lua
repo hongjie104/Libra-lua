@@ -24,8 +24,8 @@ CONFIG_SCREEN_HEIGHT = 640
 -- auto scale mode
 CONFIG_SCREEN_AUTOSCALE = "FIXED_WIDTH"
 
-LUA_UPDATE = true
+LUA_UPDATE = false
 
-LUA_UI_EDITOR = true
+LUA_UI_EDITOR = false
 
 DATA_CONFIG_PACKAGE = "libra.data.config."

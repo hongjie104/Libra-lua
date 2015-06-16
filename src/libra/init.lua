@@ -4,7 +4,6 @@
 --
 
 import(".ui.init")
--- import(".data.init")
 import(".utils.init")
 import(".log4q.init")
 
@@ -67,7 +66,7 @@ if device.platform == "windows" then
 			package.loaded[path] = nil
 
 			local newVal = orgRequire(path)
-			if type(oldVal)=="table" and type(newVal)=="table" then
+			if type(oldVal) == "table" and type(newVal) == "table" then
 				for k, v in pairs(newVal) do
 					oldVal[k] = v
 				end
@@ -81,3 +80,5 @@ if device.platform == "windows" then
 		end
 	end
 end
+
+require("libra.LibraIcon").new():addToContainer(nil, 99999)

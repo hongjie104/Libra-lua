@@ -91,16 +91,16 @@ function JScrollView:addScrollNode(node)
 		self._viewRect = self:getScrollNodeRect()
 		self:viewRect(self._viewRect)
 	end
-	node:setTouchSwallowEnabled(false)
-	node:setTouchEnabled(true)
-    node:addNodeEventListener(cc.NODE_TOUCH_CAPTURE_EVENT, function (event)
-        if self:isTouchInViewRect(event) then
-        	return "began" == event.name or "moved" == event.name or "ended" == event.name
-        end
-    end)
+	-- node:setTouchSwallowEnabled(false)
+	-- node:setTouchEnabled(true)
+ --	node:addNodeEventListener(cc.NODE_TOUCH_CAPTURE_EVENT, function (event)
+ --		if self:isTouchInViewRect(event) then
+ --			return "began" == event.name or "moved" == event.name or "ended" == event.name
+ --		end
+ --	end)
 	self:addTouchNode()
 
-    return self
+	return self
 end
 
 --- 加一个大小为viewRect的touch node
@@ -111,16 +111,16 @@ function JScrollView:addTouchNode()
 	else
 		node = display.newNode()		
 		self._touchNode = node
-		node:setTouchSwallowEnabled(true)
+		node:setTouchSwallowEnabled(false)
 		node:setTouchEnabled(true)
 		node:addNodeEventListener(cc.NODE_TOUCH_EVENT, function (event)
-	        return self:onTouch(event)
-	    end)
-	    self:addChild(node, -99)
+			return self:onTouch(event)
+		end)
+		self:addChild(node, -99)
 	end
 	node:setContentSize(self._viewRect.width, self._viewRect.height)
 	node:setPosition(self._viewRect.x, self._viewRect.y)
-    return self
+	return self
 end
 
 function JScrollView:isTouchInViewRect(event)
@@ -372,7 +372,7 @@ end
 -- @return JScrollView
 function JScrollView:onScrollListener(listener)
 	self._scrollListener = listener
-    return self
+	return self
 end
 
 function JScrollView:onUpdate(dt)

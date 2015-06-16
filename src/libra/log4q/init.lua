@@ -3,7 +3,7 @@
 -- Date: 2015-03-13 10:27:56
 --
 
-logger = import(".Logger")
+logger = import(".Logger").new()
 
 -- DEBUG:用来debug的信息
 -- INFO:有用或者无用的信息

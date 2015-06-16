@@ -7,12 +7,16 @@ local JContainer = class("JContainer", function ()
 	return display.newNode()
 end)
 
--- @param param {bg="背景图", isScale9 = true, width = int, height = int}
+-- @param param {bg="背景图", size = cc.size() or nil, capInsets = cc.rect() or nil}
 function JContainer:ctor(param)
 	self._param = param or {width = display.width, height = display.height}
 	makeUIComponent(self)
-	self:setSize(self._param.width, self._param.height)
-	self._componentList = {}
+	if self._param.size then
+		self:setSize(self._param.size.width, self._param.size.height)
+	else
+		self:setSize()
+	end
+	self._componentList = { }
 end
 
 function JContainer:createUI(uiConfig)
@@ -63,12 +67,12 @@ function JContainer:setSize(width, height)
 	self:actualWidth(width):actualHeight(height)
 	if self._param and self._param.bg then
 		if self._bg then
-			if self._param.isScale9 then
-				self._bg:setContentSize(cc.size(width, height)):pos(width / 2, height / 2)
+			if self._param.size then
+				self._bg:setContentSize(size):pos(width / 2, height / 2)
 			end
 		else
-			if self._param.isScale9 then
-				self._bg = display.newScale9Sprite(self._param.bg, width / 2, height / 2, cc.size(width, height)):addTo(self, -1):align(display.CENTER)
+			if self._param.size then
+				self._bg = display.newScale9Sprite(self._param.bg, width / 2, height / 2, self._param.size, self._param.capInsets):addTo(self, -1):align(display.CENTER)
 			else
 				self._bg = display.newSprite(self._param.bg):addTo(self, -1):pos(display.cx, display.cy)
 			end
@@ -89,7 +93,7 @@ function JContainer:addComponent(component, zOrder)
 	if not table.indexof(self._componentList, component) then
 		self:addChild(component)
 		if type(zOrder) == "number" then
-			component:setLocalZOrder(zOrder)
+			component:zorder(zOrder)
 		end
 		self._componentList[#self._componentList + 1] = component
 	end
@@ -105,7 +109,7 @@ end
 
 function JContainer:clearComponents()
 	self:removeAllChildren()
-	self._componentList = {}
+	self._componentList = { }
 end
 
 function JContainer:updateLayout()

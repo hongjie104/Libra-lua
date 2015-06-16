@@ -3,55 +3,60 @@
 -- Date: 2015-03-13 10:11:02
 --
 
+local MAX_COUNT = 50
+
 local Logger = class("Logger")
+
+function Logger:ctor()
+	self._logList = { }
+	self._count = 0
+end
+
+function Logger:getLogList()
+	return self._logList
+end
+
+function Logger:printLog(tag, ...)
+	local log = tag
+	for k, v in pairs({...}) do
+		log = log .. tostring(v) .. ' '
+	end
+	self._count = self._count + 1
+	self._logList[self._count] = log
+	if self._count > 50 then
+		self._count = 50
+		table.remove(self._logList, 1)
+	end
+	print(log)
+end
 
 function Logger:debug(...)
 	if LOG_LEVEL.DEBUG then
-		local info = "[DEBUG]:"
-		for k, v in pairs({...}) do
-			info = info .. tostring(v) .. ' '
-		end
-		print(info)
+		self:printLog("[DEBUG]:", ...)
 	end
 end
 
 function Logger:info(...)
 	if LOG_LEVEL.INFO then
-		local info = "[INFO]:"
-		for k, v in pairs({...}) do
-			info = info .. tostring(v) .. ' '
-		end
-		print(info)
+		self:printLog("[INFO]:", ...)
 	end
 end
 
 function Logger:warn(...)
 	if LOG_LEVEL.WARN then
-		local info = "[WARN]:"
-		for k, v in pairs({...}) do
-			info = info .. tostring(v) .. ' '
-		end
-		print(info)
+		self:printLog("[WARN]:", ...)
 	end
 end
 
 function Logger:error(...)
 	if LOG_LEVEL.ERROR then
-		local info = "[ERROR]:"
-		for k, v in pairs({...}) do
-			info = info .. tostring(v) .. ' '
-		end
-		print(info)
+		self:printLog("[ERROR]:", ...)
 	end
 end
 
 function Logger:fatal(...)
 	if LOG_LEVEL.FATAL then
-		local info = "[FATAL]:"
-		for k, v in pairs({...}) do
-			info = info .. tostring(v) .. ' '
-		end
-		print(info)
+		self:printLog("[FATAL]:", ...)
 	end
 end
 

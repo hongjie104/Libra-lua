@@ -52,8 +52,7 @@ end
 
 local function addToContainer(self, container, zOrder)
 	local container = container or libraUIManager:getUIContainer()
-	assert(container.isContainer, "libra.ui.init.addToContainer() - invalid container")
-	assert(container:isContainer(), "libra.ui.init.addToContainer() - invalid container")
+	assert(type(container.isContainer) == "function" and container:isContainer(), "libra.ui.init.addToContainer() - invalid container")
 	if container ~= self then
 		container:addComponent(self, zOrder)
 	end

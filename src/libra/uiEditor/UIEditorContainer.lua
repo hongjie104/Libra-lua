@@ -13,11 +13,11 @@ function UIEditorContainer:ctor()
 	self._layer = Container.new():addToContainer(self)
 	self._layer:setVisible(false)
 
-	require("libra.uiEditor.IconBtn").new({normal = "uiEditor/uiEditorIco.jpg"}, function (icon)
-		if not icon:isTouchMoved() then
-			self._layer:setVisible(not self._layer:isVisible())
-		end
-	end):addToContainer(self)
+	-- require("libra.uiEditor.IconBtn").new({normal = "uiEditor/uiEditorIco.jpg"}, function (icon)
+	-- 	if not icon:isTouchMoved() then
+	-- 		self._layer:setVisible(not self._layer:isVisible())
+	-- 	end
+	-- end):addToContainer(self)
 
 	require("libra.uiEditor.Toolbar").new({
 		showUIList = function ()
