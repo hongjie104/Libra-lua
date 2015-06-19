@@ -8,23 +8,26 @@ local ListView = require("libra.ui.components.JListView")
 
 local LogPanel = class("LogPanel", require("libra.uiController.Panel"))
 
-function LogPanel:ctor()
-	LogPanel.super.ctor(self)
+local PANEL_WIDTH, PANEL_HEIGHT = display.width - 100, display.height - 100
 
-	for i = 1, 100 do
-		logger:debug("上的佛法马克思的福建省的对方的", i)
-	end
+function LogPanel:ctor()
+	LogPanel.super.ctor(self, cc.size(PANEL_WIDTH, PANEL_HEIGHT))
+
+	-- for i = 1, 4 do
+	-- 	logger:debug("上的佛法马克思的福建省的对方的", i, "ddsfdsfdsfdsfd12321321fdfffffffffffffd")
+	-- end
 	self._logList = logger:getLogList()
 
 	self._listView = ListView.new({
-		viewRect = cc.rect(0, 0, 600, 360),
-		}):onTouchListener(handler(self, self.touchListener8))
-		:addToContainer(self):pos(0, 20)
-	self._listView:setDelegate(handler(self, self.sourceDelegate))
+			viewRect = cc.rect(0, 0, PANEL_WIDTH - 100, PANEL_HEIGHT - 100),
+		})
+		-- :onTouchListener(handler(self, self.onLogItemTouched))
+		:addToContainer(self):pos(50, 50)
+	self._listView:setDelegate(handler(self, self.listViewSourceDelegate))
 	self._listView:reload()
 end
 
-function LogPanel:sourceDelegate(listView, tag, idx)
+function LogPanel:listViewSourceDelegate(listView, tag, idx)
 	if TAG.COUNT_TAG == tag then
 		return #self._logList
 	elseif TAG.CELL_TAG == tag then
@@ -34,24 +37,25 @@ function LogPanel:sourceDelegate(listView, tag, idx)
 			content = Label.new(
 					{
 						size = 20,
-						align = cc.ui.TEXT_ALIGN_CENTER,
-						color = cc.c3b(98, 29, 7)
+						align = cc.ui.TEXT_ALIGN_LEFT,
+						color = cc.c3b(98, 29, 7),
+						dimensions = cc.size(PANEL_WIDTH - 100, 0)
 					})
 			item = listView:newItem(content)
 		else
 			content = item:getContent()
 		end
-		content:setString(self._logList[idx + 1])
-		item:actualWidth(600):actualHeight(30)
+		content:setString(self._logList[idx])
+		item:actualWidth(PANEL_WIDTH - 100):actualHeight(content:getContentSize().height)
 		return item
 	end
 end
 
-function LogPanel:touchListener8(event)
-	local listView = event.listView
-	if "clicked" == event.name then
-		print("async list view clicked idx:" .. event.itemPos)
-	end
-end
+-- function LogPanel:onLogItemTouched(event)
+-- 	local listView = event.listView
+-- 	if "clicked" == event.name then
+-- 		print("async list view clicked idx:" .. event.itemPos)
+-- 	end
+-- end
 
 return LogPanel

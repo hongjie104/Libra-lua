@@ -19,14 +19,14 @@ end
 function Logger:printLog(tag, ...)
 	local log = tag
 	for k, v in pairs({...}) do
-		log = log .. tostring(v) .. ' '
+		log = string.format("%s%s ", log, tostring(v))
+	end
+	if self._count == MAX_COUNT then
+		table.remove(self._logList, 1)
+		self._count = MAX_COUNT - 1
 	end
 	self._count = self._count + 1
 	self._logList[self._count] = log
-	if self._count > 50 then
-		self._count = 50
-		table.remove(self._logList, 1)
-	end
 	print(log)
 end
 

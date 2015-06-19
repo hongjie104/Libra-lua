@@ -5,9 +5,9 @@
 
 local Panel = class("Panel", require("libra.ui.components.JPanel"))
 
-function Panel:ctor()
-	Panel.super.ctor(self, {bg = "ui/ty_erjikuang.png", size = cc.size(600, 400), closeBtnParam = {normal = "ui/ty_guanbi.png"}})
-	self._closeBtn:addXY(-10, -10)
+function Panel:ctor(size)
+	Panel.super.ctor(self, {bg = "ui/ty_erjikuang.png", size = size or cc.size(600, 400), closeBtnParam = {normal = "ui/ty_guanbi.png"}})
+	self._closeBtn:addXY(-14, -14)
 end
 
 return Panel
