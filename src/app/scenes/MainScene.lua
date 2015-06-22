@@ -98,6 +98,16 @@ function MainScene:ctor()
 	dataManager:dispatchEvent({name = 'testEvent'})
 
 	print(data:cfg().Func)
+
+
+	self:setKeypadEnabled(true)
+	self:addNodeEventListener(cc.KEYPAD_EVENT, function (event)
+		-- if event.code == cc.KeyCode.KEY_KP_PG_DOWN then
+		-- 	print("down")
+		-- end
+		print(event.code)
+	end)
+	-- self:addEventListener()
 end
 
 --[[

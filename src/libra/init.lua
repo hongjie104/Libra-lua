@@ -7,6 +7,12 @@ import(".ui.init")
 import(".utils.init")
 import(".log4q.init")
 
+if device.platform == "android" then
+	import(".platform.android")
+elseif device.platform == "windows" then
+	import(".platform.windows")
+end
+
 if LUA_UPDATE then 
 	-- 在win平台,才开启代码热更新机制
 	if device.platform == "windows" then
