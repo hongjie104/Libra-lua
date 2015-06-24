@@ -23,8 +23,8 @@ function LoginScene:onExit()
 	sceneOnExit(self)
 end
 
-function LoginScene:onExitTransitionStart()
-	-- body
+function LoginScene:onEnterTransitionFinish()
+	sceneOnEnterTransitionFinish(self)
 end
 
 return LoginScene

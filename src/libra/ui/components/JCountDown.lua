@@ -5,15 +5,17 @@
 
 local JCountDown = class("JCountDown", require("libra.ui.components.JLabel"))
 
-function JCountDown:ctor(param, onFinished)
+function JCountDown:ctor(param)
 	JCountDown.super.ctor(self, param)
-	self._onFinished = onFinished
+	cc(self):addComponent("components.behavior.EventProtocol"):exportMethods()
 
  	local seq = transition.sequence({
         cc.DelayTime:create(1),
         cc.CallFunc:create(handler(self, self.onCountDownActionHandler)),
     })
     self._countDownAction = cc.RepeatForever:create(seq)
+
+    self:setNodeEventEnabled(true)
 end
 
 function JCountDown:start(second, minute, hour)
@@ -27,6 +29,7 @@ function JCountDown:start(second, minute, hour)
 		self._isRunning = true
 	end
 	self:updateDisplay()
+	return self
 end
 
 function JCountDown:pause()
@@ -34,6 +37,7 @@ function JCountDown:pause()
 		transition.pauseTarget(self)
 		self._isRunning = false
 	end
+	return self
 end
 
 function JCountDown:resume()
@@ -41,6 +45,7 @@ function JCountDown:resume()
 		transition.resumeTarget(self)
 		self._isRunning = true
 	end
+	return self
 end
 
 function JCountDown:stop()
@@ -48,6 +53,7 @@ function JCountDown:stop()
 		transition.stopTarget(self)
 		self._isRunning = false
 	end
+	return self
 end
 
 function JCountDown:isRunning()
@@ -59,11 +65,7 @@ function JCountDown:onCountDownActionHandler()
 	if self._hour == 0 then
 		if self._minute == 0 then
 			if self._second == 0 then
-				if self._onFinished then
-					if type(self._onFinished) == "function" then
-						self._onFinished()
-					end
-				end
+				self:dispatchEvent({name = COUNT_DOWN_EVENT.COMPLETED})
 			end
 		end
 	end
@@ -87,6 +89,7 @@ function JCountDown:updateDisplay()
 end
 
 function JCountDown:onCleanup()
+	self:setNodeEventEnabled(false)
 	self:stop()
 end
 

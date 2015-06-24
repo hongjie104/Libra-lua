@@ -153,4 +153,8 @@ function MainScene:onExit()
 	sceneOnExit(self)
 end
 
+function MainScene:onEnterTransitionFinish()
+	sceneOnEnterTransitionFinish(self)
+end
+
 return MainScene

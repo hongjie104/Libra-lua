@@ -104,6 +104,10 @@ function sceneOnExit(scene)
 	-- end
 end
 
+function sceneOnEnterTransitionFinish(scene)
+	focusManager:init()
+end
+
 --===========================================================================================
 
 function getStringLength(str)

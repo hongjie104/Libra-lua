@@ -9,7 +9,9 @@ function MyApp:ctor()
 end
 
 function MyApp:run()
-	self:enterScene("MainScene")
+	-- self:enterScene("test.ButtonScene")
+	-- self:enterScene("test.CheckBoxScene")
+	self:enterScene("test.CountDownScene")
 end
 
 return MyApp

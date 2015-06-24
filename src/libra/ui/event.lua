@@ -9,3 +9,15 @@ BUTTON_EVENT = {
 	TOUCH_MOVED = "touchMoved",
 	TOUCH_ENDED = "touchEnded"
 }
+
+CHECKBOX_EVENT = {
+	CHANGED = "changed"
+}
+
+CHECKBOX_GROUP_EVENT = {
+	SELECTED = "selected"
+}
+
+COUNT_DOWN_EVENT = {
+	COMPLETED = "completed"
+}

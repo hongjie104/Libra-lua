@@ -33,16 +33,16 @@ local function name(self, str)
 	return self._name
 end
 
-local function showBorder(self)
-	if self._border then
-		self._border:setVisible(true)
-	else
-		-- self._border = display.newRect(cc.rect(self._actualWidth / -2, self._actualHeight / -2, self._actualWidth, self._actualHeight), 
-		-- 	{borderColor = cc.c4f(0,1,0,1)}):addTo(self)
-		self._border = display.newScale9Sprite("uiEditor/border.png", 0, 0, self:getContentSize()):addTo(self)
-	end
-	return self
-end
+-- local function showBorder(self)
+-- 	if self._border then
+-- 		self._border:setVisible(true)
+-- 	else
+-- 		-- self._border = display.newRect(cc.rect(self._actualWidth / -2, self._actualHeight / -2, self._actualWidth, self._actualHeight), 
+-- 		-- 	{borderColor = cc.c4f(0,1,0,1)}):addTo(self)
+-- 		self._border = display.newScale9Sprite("uiEditor/border.png", 0, 0, self:getContentSize()):addTo(self)
+-- 	end
+-- 	return self
+-- end
 
 local function closeBorder(self)
 	if self._border then
@@ -54,7 +54,17 @@ local function addToContainer(self, container, zOrder)
 	local container = container or libraUIManager:getUIContainer()
 	assert(type(container.isContainer) == "function" and container:isContainer(), "libra.ui.init.addToContainer() - invalid container")
 	if container ~= self then
-		container:addComponent(self, zOrder)
+		container:addUIComponent(self, zOrder)
+	end
+	return self
+end
+
+local function removeSelf(self)
+	local container = self:getParent()
+	if type(container.isContainer) == "function" and container:isContainer() then
+		container:removeUIComponent(self)
+	else
+		self:removeFromParent(true)
 	end
 	return self
 end
@@ -74,9 +84,10 @@ function makeUIComponent(component)
 	component._name = component.class.__cname
     component.name = name
 
-    component.showBorder = showBorder
+    -- component.showBorder = showBorder
     component.closeBorder = closeBorder
     component.addToContainer = addToContainer
+    component.removeSelf = removeSelf
 end
 
 import(".event")
@@ -100,3 +111,4 @@ TAG = {
 UI_CONFIG = UI_CONFIG or { }
 
 libraUIManager = require("libra.ui.managers.UIManager").new()
+focusManager = require("libra.ui.managers.FocusManager").new()

@@ -22,7 +22,7 @@ end)
 
 --- 构造函数
 -- @param param {normmal = "按钮正常状态时图片", down = "按钮按下状态图片", unabled = "按钮不可用状态图片",  label = {text = "按钮文字", size = 24}}
--- size = ccsize 如果有值,说明是九宫图, capInsets = CCRect,
+-- size = ccsize 如果有值,说明是九宫图, capInsets = CCRect, labelImg = "图片名",labelImgX = 图片横坐标, labelImgY = 图片纵坐标
 function JButton:ctor(param)
 	self._param = param
 	makeUIComponent(self)
@@ -41,6 +41,10 @@ function JButton:ctor(param)
 		else
 			self._label = Label.new(self._param.label):addTo(self):align(display.CENTER, self._actualWidth / 2, self._actualHeight / 2)
 		end
+	end
+
+	if self._param.labelImg then
+		self._img = display.newSprite(self._param.labelImg, self._param.labelImgX, self._param.labelImgY):addTo(self)
 	end
 
 	self:enabled(true)

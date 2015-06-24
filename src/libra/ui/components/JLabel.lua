@@ -4,8 +4,8 @@
 --
 
 local JLabel = class("JLabel", function (param)
-	assert(param, "JLabel:class() - invalid param:param is nil")
-	if param.isBMFont then
+	param = param or { }
+	if param and param.isBMFont then
 		--[[--
 
 		用位图字体创建文本显示对象，并返回 LabelBMFont 对象。

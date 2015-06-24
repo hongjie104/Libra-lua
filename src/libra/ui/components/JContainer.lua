@@ -11,6 +11,7 @@ end)
 function JContainer:ctor(param)
 	self._param = param or {width = display.width, height = display.height}
 	makeUIComponent(self)
+	
 	if self._param.size then
 		self:setSize(self._param.size.width, self._param.size.height)
 	else
@@ -25,6 +26,7 @@ function JContainer:createUI(uiConfig)
 		uiComponent = require(ui.ui).new(ui.param):addToContainer(self)
 		if ui.id then
 			self[ui.id] = uiComponent
+			uiComponent:name(ui.id)
 		end
 		for k, v in pairs(ui) do
 			if k ~= "id" and k ~= 'ui' and k ~= 'param' then
@@ -89,7 +91,7 @@ function JContainer:isContainer()
 	return true
 end
 
-function JContainer:addComponent(component, zOrder)
+function JContainer:addUIComponent(component, zOrder)
 	if not table.indexof(self._componentList, component) then
 		self:addChild(component)
 		if type(zOrder) == "number" then
@@ -97,6 +99,7 @@ function JContainer:addComponent(component, zOrder)
 		end
 		self._componentList[#self._componentList + 1] = component
 	end
+	return self
 end
 
 function JContainer:getComponent(name)
@@ -107,20 +110,17 @@ function JContainer:getComponent(name)
 	end
 end
 
-function JContainer:clearComponents()
-	self:removeAllChildren()
-	self._componentList = { }
-end
-
-function JContainer:updateLayout()
-	if self._layout then
-		self._layout:updateLayout()
+function JContainer:removeUIComponent(component)
+	local index = table.indexof(self._componentList, component)
+	if index then
+		table.remove(self._componentList, index)
+		component:removeFromParent(true)
 	end
 end
 
-function JContainer:setLayout(val)
-	self._layout = val
-	return self
+function JContainer:clearComponents()
+	self:removeAllChildren()
+	self._componentList = { }
 end
 
 return JContainer

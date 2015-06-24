@@ -10,13 +10,13 @@ local JCheckBox = class("JCheckBox", function (param)
 	return display.newSprite(param.bg or param.selected)
 end)
 
--- @param param {bg = "背景图", selected = "选中的图片", unselected = "未选中的图片"}
--- @param onSelected 选中状态改变时的回调
+-- @param param {bg = "背景图", selected = "选中的图片", unselected = "未选中的图片", label = {font = "FONT", text = "text", size = 24}}
 -- @param isSelected 初始状态是否是选中的，默认为不选中
-function JCheckBox:ctor(param, onSelected, isSelected)
-	self._param, self._onSelected = param, onSelected
+function JCheckBox:ctor(param, isSelected)
+	self._param = param
 	isSelected = isSelected or false
 	makeUIComponent(self)
+	cc(self):addComponent("components.behavior.EventProtocol"):exportMethods()
 
 	if not param.bg then
 		self._selectedIcon = self
@@ -32,7 +32,7 @@ function JCheckBox:ctor(param, onSelected, isSelected)
 		end
 	end
 	self._selected = not isSelected
-	self:selected(isSelected)
+	self:selected(isSelected, false)
 
 	if self._param.label then
 		self._label = Label.new(self._param.label):addTo(self):align(display.CENTER, self._actualWidth / 2, self._actualHeight / 2)
@@ -69,9 +69,14 @@ function JCheckBox:selected(bool, callback, passive)
 		if self._selected ~= bool then
 			if not self._group or not self._selected or passive then
 				self._selected = bool
+				if callback == nil then
+					callback = true
+				end
 				if self._selected then
 					if self._group then
-						self._group:selectedCheckBox(self)
+						if callback then
+							self._group:selectedCheckBox(self)
+						end						
 					end
 					self._selectedIcon:setTexture(self._param.selected)
 					self._selectedIcon:show()
@@ -82,16 +87,8 @@ function JCheckBox:selected(bool, callback, passive)
 						self._selectedIcon:hide()
 					end
 				end
-
-				if callback == nil then
-					callback = true
-				end
 				if callback then
-					if self._onSelected then
-						if type(self._onSelected) == "function" then
-							self._onSelected(self._selected)
-						end
-					end
+					self:dispatchEvent({name = CHECKBOX_EVENT.CHANGED})
 				end
 			end
 		end
