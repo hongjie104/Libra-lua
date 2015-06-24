@@ -14,7 +14,7 @@ function LogPanel:ctor()
 	LogPanel.super.ctor(self, cc.size(PANEL_WIDTH, PANEL_HEIGHT))
 
 	-- for i = 1, 4 do
-	-- 	logger:debug("上的佛法马克思的福建省的对方的", i, "ddsfdsfdsfdsfd12321321fdfffffffffffffd")
+	-- 	logger:debug('发送登录消息: {"Command":"Login","Account":"test003243","Password":"asd","ServerID":"1","Platform":"apowo","Device":"50-46-5D-55-7D-C3","Reconnect":"0","IsVisitor":"False"}')
 	-- end
 	self._logList = logger:getLogList()
 

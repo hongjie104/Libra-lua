@@ -42,6 +42,8 @@ ifeq ($(NDK_DEBUG),1)
 LOCAL_STATIC_LIBRARIES += cocos_protobuf-lite_static
 endif
 
+LOCAL_WHOLE_STATIC_LIBRARIES := quickextenpbc
+
 include $(BUILD_SHARED_LIBRARY)
 
 $(call import-module,scripting/lua-bindings/proj.android)
@@ -49,5 +51,6 @@ $(call import-module,scripting/lua-bindings/proj.android)
 $(call import-module, quick-src/lua_extensions)
 $(call import-module, quick-src/extra)
 $(call import-module, protobuf-lite)
+$(call import-module, luaproj.android)
 
 

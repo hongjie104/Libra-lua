@@ -85,7 +85,6 @@ function LibraIcon:ctor(param)
 	LibraIcon.super.ctor(self, param)
 
 	self._icon = Button.new({normal = "uiEditor/uiEditorIco.jpg"}):addToContainer(self)
-	-- self._icon = Button.new({normal = "uiEditor/closeBtn_down.png"}):addToContainer(self)
 
 	self._iconWidthHarf, self._iconHeightHarf = self._icon:actualWidth() / 2, self._icon:actualHeight() / 2
 	self._icon:setPosition(self._iconWidthHarf, self._iconHeightHarf)

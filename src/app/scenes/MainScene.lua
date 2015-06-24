@@ -19,7 +19,7 @@ end)
 function MainScene:ctor()
 
 	local test = {
-					{id = "_testBtn", ui = "libra.ui.components.JButton", param = {normal = "ui/ty_anniu02.png", label = {text = "hello world", size = 24}}, x = display.cx, y = display.cy},
+					{id = "_testBtn", ui = "libra.ui.components.JButton", param = {normal = "ui/ty_anniu02.png", label = {text = "123", size = 24}}, x = display.cx, y = display.cy},
 					{id = "_testBtn1", ui = "libra.ui.components.JButton", param = {normal = "ui/ty_anniu02.png", label = {text = "hello world", size = 24}}, x = display.cx, y = display.cy + 50}
 				}
 	libraUIManager:getUIContainer():createUI(test)
@@ -73,16 +73,11 @@ function MainScene:ctor()
 		print(ff)
 		self._numScroller:scrollTo(ff)
 	end)
-	-- libraUIManager:getUIContainer()._testBtn:onClicked(function ()
-	-- 	local ff = math.random(999)
-	-- 	print(ff)
-	-- 	self._numScroller:scrollTo(ff)
-	-- end)
-	-- libraUIManager:getUIContainer()._testBtn1:onClicked(function ()
-	-- 	local ff = math.random(999)
-	-- 	print(ff)
-	-- 	self._numScroller:scrollTo(ff, 54554)
-	-- end)
+	libraUIManager:getUIContainer()._testBtn1:addEventListener(BUTTON_EVENT.CLICKED, function ()
+		self._socket = require("libra.net.socket.SocketHandler").new()
+		self._socket:startConnect("test003243", "asd")
+		logger:info("gggggggggggggggg")
+	end)
 	--]]
 
 
@@ -111,6 +106,10 @@ function MainScene:ctor()
 		end
 	end)
 	]]
+
+	--=========================================
+
+	logger:info("进入到主场景了")
 end
 
 --[[
