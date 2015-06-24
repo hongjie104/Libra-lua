@@ -2,3 +2,7 @@
 *.sublime-project
 *.sublime-workspace
 *.log
+/frameworks/runtime-src/proj.android_no_anysdk/obj
+/frameworks/runtime-src/proj.android_no_anysdk/bin
+/frameworks/runtime-src/proj.android_no_anysdk/gen
+/frameworks/runtime-src/proj.android_no_anysdk/libs
