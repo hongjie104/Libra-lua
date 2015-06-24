@@ -99,15 +99,18 @@ function MainScene:ctor()
 
 	print(data:cfg().Func)
 
-
+	--[[
 	self:setKeypadEnabled(true)
 	self:addNodeEventListener(cc.KEYPAD_EVENT, function (event)
 		-- if event.code == cc.KeyCode.KEY_KP_PG_DOWN then
 		-- 	print("down")
 		-- end
 		print(event.code)
+		if event.code == cc.KeyCode.KEY_DOWN_ARROW then
+			print("down")
+		end
 	end)
-	-- self:addEventListener()
+	]]
 end
 
 --[[

@@ -78,13 +78,12 @@ function sceneOnEnter(scene)
 		-- avoid unmeant back
 		scene:performWithDelay(function()
 			-- keypad layer, for android
-			local layer = display.newLayer()
-			layer:addKeypadEventListener(function(event)
-				if event == "back" then app.exit() end
+			local layer = display.newNode()
+			layer:setKeypadEnabled(true)
+			layer:addNodeEventListener(cc.KEYPAD_EVENT, function (event)
+				if event.key == "back" then app.exit() end
 			end)
 			scene:addChild(layer)
-
-			layer:setKeypadEnabled(true)
 		end, 0.5)
 	end
 end
