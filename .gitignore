@@ -9,3 +9,6 @@
 /frameworks/runtime-src/proj.wp8-xaml
 /frameworks/runtime-src/proj.ios_mac
 /frameworks/runtime-src/proj.win32
+/frameworks/runtime-src/proj.android_no_anysdk/assets
+/frameworks/runtime-src/proj.android_no_anysdk/project.properties
+/frameworks/runtime-src/proj.android_no_anysdk/.classpath

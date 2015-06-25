@@ -12,6 +12,7 @@ function UIManager:ctor()
 
 	self._uiContainer:setKeypadEnabled(true)
 	self._uiContainer:addNodeEventListener(cc.KEYPAD_EVENT, function (event)
+		logger:info("event.code = ", event.code, "event.key = ", event.key)
 		if event.code == cc.KeyCode.KEY_DOWN_ARROW then
 			-- Direction.TOP_TO_BOTTOM
 		elseif event.code == cc.KeyCode.KEY_UP_ARROW then

@@ -558,10 +558,7 @@ cc.KeyCodeKey =
     "KEY_PLAY",
 }
 
-cc.KeyCode =
-{
-}
-
+cc.KeyCode = { }
 for k,v in ipairs(cc.KeyCodeKey) do
     cc.KeyCode[v] = k - 1
 end
