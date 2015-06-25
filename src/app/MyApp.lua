@@ -11,7 +11,8 @@ end
 function MyApp:run()
 	-- self:enterScene("test.ButtonScene")
 	-- self:enterScene("test.CheckBoxScene")
-	self:enterScene("test.CountDownScene")
+	-- self:enterScene("test.CountDownScene")
+	self:enterScene("MainScene")
 end
 
 return MyApp
