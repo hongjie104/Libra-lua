@@ -13,10 +13,10 @@ function ButtonScene:ctor()
 				}
 	libraUIManager:getUIContainer():createUI(test)
 
-	libraUIManager:getUIContainer():getComponent("_testBtn"):addEventListener(BUTTON_EVENT.CLICKED, function (event)
+	libraUIManager:getUIContainer():getUIComponent("_testBtn"):addEventListener(BUTTON_EVENT.CLICKED, function (event)
 		print(string.format("%s clicked", event.target:name()))
 	end)
-	libraUIManager:getUIContainer():getComponent("_testBtn1"):addEventListener(BUTTON_EVENT.CLICKED, function (event)
+	libraUIManager:getUIContainer():getUIComponent("_testBtn1"):addEventListener(BUTTON_EVENT.CLICKED, function (event)
 		print(string.format("%s clicked", event.target:name()))
 	end)
 

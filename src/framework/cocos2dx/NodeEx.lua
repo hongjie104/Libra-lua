@@ -398,8 +398,8 @@ function Node:EventDispatcher( idx, data )
         local code = data[1]
         -- local evt = data[2]
         local ename = data[3]
-        if ename~='Released' then return true end
-        event = { code=code, key=KeypadEventCodeConvert(code), }
+        -- if ename~='Released' then return true end
+        event = { code=code, key=KeypadEventCodeConvert(code), name = ename}
     else
         event = data
         -- dump(event)

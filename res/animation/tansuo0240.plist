@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>frames</key>
+        <dict>
+            <key>tansuo024_1.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,2},{74,53}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{74,53}}</string>
+                <key>sourceSize</key>
+                <string>{74,53}</string>
+            </dict>
+        </dict>
+        <key>metadata</key>
+        <dict>
+            <key>format</key>
+            <integer>2</integer>
+            <key>realTextureFileName</key>
+            <string>tansuo0240.png</string>
+            <key>size</key>
+            <string>{78,57}</string>
+            <key>smartupdate</key>
+            <string>$TexturePacker:SmartUpdate:18377dabd961f4d547b36d60c933d094:32f62cdf235e43126e4051ee9571e149:9e1f1257657d5140554ebd482c5681cd$</string>
+            <key>textureFileName</key>
+            <string>tansuo0240.png</string>
+        </dict>
+    </dict>
+</plist>

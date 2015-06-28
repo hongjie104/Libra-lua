@@ -102,7 +102,7 @@ function JContainer:addUIComponent(component, zOrder)
 	return self
 end
 
-function JContainer:getComponent(name)
+function JContainer:getUIComponent(name)
 	if name and name ~= '' then
 		for _, v in ipairs(self._componentList) do
 			if v:name() == name then return v end
@@ -121,6 +121,47 @@ end
 function JContainer:clearComponents()
 	self:removeAllChildren()
 	self._componentList = { }
+end
+
+--- 刷新面板，因为数据层的变化，面板也要随之更新
+function JContainer:update(param)
+	-- body
+end
+
+function JContainer:onKeyPressed(key)
+	if key == KEY.LEFT then
+		logger:info("left key pressed")
+	elseif key == KEY.RIGHT then
+		logger:info("right key pressed")
+	elseif key == KEY.UP then
+		logger:info("up key pressed")
+	elseif key == KEY.DOWN then
+		logger:info("down key pressed")
+	elseif key == KEY.MENU then
+		logger:info("MENU key pressed")
+	elseif key == KEY.OK then
+		logger:info("OK key pressed")
+	else
+		logger:warn(key, "没注册事件监听")
+	end
+end
+
+function JContainer:onKeyReleased(key)
+	if key == KEY.LEFT then
+		logger:info("left key released")
+	elseif key == KEY.RIGHT then
+		logger:info("right key released")
+	elseif key == KEY.UP then
+		logger:info("up key released")
+	elseif key == KEY.DOWN then
+		logger:info("down key released")
+	elseif key == KEY.MENU then
+		logger:info("MENU key released")
+	elseif key == KEY.OK then
+		logger:info("OK key released")
+	else
+		logger:warn(key, "没注册事件监听")
+	end
 end
 
 return JContainer

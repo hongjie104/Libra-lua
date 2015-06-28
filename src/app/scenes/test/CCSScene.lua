@@ -44,8 +44,8 @@ function CCSScene:ctor()
 
 	local function dataLoaded(percent)
 		if percent >= 1 then
-			local armature = ccs.Armature:create("skillfight3001_after")
-			armature:getAnimation():play("Animation1")
+			local armature = ccs.Armature:create("tansuo024")
+			armature:getAnimation():play("tansuo024_1")
 			armature:addTo(self):pos(display.cx, display.cy)
 
 			armature:getAnimation():setMovementEventCallFunc(animationEvent)
@@ -53,7 +53,7 @@ function CCSScene:ctor()
 		end
 	end
 
-	ccs.ArmatureDataManager:getInstance():addArmatureFileInfoAsync("animation/skillfight3001_after.ExportJson", dataLoaded)
+	ccs.ArmatureDataManager:getInstance():addArmatureFileInfoAsync("animation/tansuo024.ExportJson", dataLoaded)
 end
 
 function CCSScene:onEnter()
