@@ -19,6 +19,14 @@ function UIManager:ctor()
 	self._activeContainer = self._uiContainer
 end
 
+function UIManager:activeContainer(val)
+	if val then
+		self._activeContainer = val
+		return self
+	end
+	return self._activeContainer
+end
+
 -- @private
 function UIManager:onKeyPadEvent(event)
 	if self._activeContainer then

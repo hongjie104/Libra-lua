@@ -41,11 +41,11 @@ end
 
 --- 根据type读取相应的配置文件
 -- @param propType 物品Type
--- @param configType 配置文件，取lua文件名
+-- @param configName 配置文件，取lua文件名
 -- @return 返回配置文件中物品的配置信息
-function getConfig(propType, configType, compareStr)
+function getConfig(propType, configName, compareStr)
 	compareStr = compareStr and compareStr or 'ID'
-	local config = require(DATA_CONFIG_PACKAGE .. configType)
+	local config = require(DATA_CONFIG_PACKAGE .. configName)
 	if config then
 		return queryByType(config, compareStr, checkint(propType))
 	end
@@ -74,6 +74,7 @@ function sceneOnEnter(scene)
 		import("libra.uiEditor.UIEditorContainer").new():addToContainer()
 	end
 
+	----[[
 	if device.platform == "android" then
 		-- avoid unmeant back
 		scene:performWithDelay(function()
@@ -86,6 +87,7 @@ function sceneOnEnter(scene)
 			scene:addChild(layer)
 		end, 0.5)
 	end
+	--]]
 end
 
 function sceneOnExit(scene)

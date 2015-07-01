@@ -21,3 +21,18 @@ CHECKBOX_GROUP_EVENT = {
 COUNT_DOWN_EVENT = {
 	COMPLETED = "completed"
 }
+
+KEY_EVENT = {
+	LEFT_PRESSED   = "leftPressed",
+	LEFT_RELEASED  = "leftReleased",
+	RIGHT_PRESSED  = "rightPressed",
+	RIGHT_RELEASED = "rightReleased",
+	UP_PRESSED     = "upPressed",
+	UP_RELEASED    = "upReleased",
+	DOWN_PRESSED   = "downPressed",
+	DOWN_RELEASED  = "downReleased",
+	MENU_PRESSED   = "menuPressed",
+	MENU_RELEASED  = "menuReleased",
+	OK_PRESSED     = "okPressed",
+	OK_RELEASED    = "okReleased"
+}

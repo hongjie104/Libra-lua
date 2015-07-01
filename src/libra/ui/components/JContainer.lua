@@ -11,6 +11,7 @@ end)
 function JContainer:ctor(param)
 	self._param = param or {width = display.width, height = display.height}
 	makeUIComponent(self)
+	cc(self):addComponent("components.behavior.EventProtocol"):exportMethods()
 	
 	if self._param.size then
 		self:setSize(self._param.size.width, self._param.size.height)
@@ -130,17 +131,17 @@ end
 
 function JContainer:onKeyPressed(key)
 	if key == KEY.LEFT then
-		logger:info("left key pressed")
+		self:dispatchEvent({name = KEY_EVENT.LEFT_PRESSED})
 	elseif key == KEY.RIGHT then
-		logger:info("right key pressed")
+		self:dispatchEvent({name = KEY_EVENT.RIGHT_PRESSED})
 	elseif key == KEY.UP then
-		logger:info("up key pressed")
+		self:dispatchEvent({name = KEY_EVENT.UP_PRESSED})
 	elseif key == KEY.DOWN then
-		logger:info("down key pressed")
+		self:dispatchEvent({name = KEY_EVENT.DOWN_PRESSED})
 	elseif key == KEY.MENU then
-		logger:info("MENU key pressed")
+		self:dispatchEvent({name = KEY_EVENT.MENU_PRESSED})
 	elseif key == KEY.OK then
-		logger:info("OK key pressed")
+		self:dispatchEvent({name = KEY_EVENT.OK_PRESSED})
 	else
 		logger:warn(key, "没注册事件监听")
 	end
@@ -148,17 +149,17 @@ end
 
 function JContainer:onKeyReleased(key)
 	if key == KEY.LEFT then
-		logger:info("left key released")
+		self:dispatchEvent({name = KEY_EVENT.LEFT_RELEASED})
 	elseif key == KEY.RIGHT then
-		logger:info("right key released")
+		self:dispatchEvent({name = KEY_EVENT.RIGHT_RELEASED})
 	elseif key == KEY.UP then
-		logger:info("up key released")
+		self:dispatchEvent({name = KEY_EVENT.UP_RELEASED})
 	elseif key == KEY.DOWN then
-		logger:info("down key released")
+		self:dispatchEvent({name = KEY_EVENT.DOWN_RELEASED})
 	elseif key == KEY.MENU then
-		logger:info("MENU key released")
+		self:dispatchEvent({name = KEY_EVENT.MENU_RELEASED})
 	elseif key == KEY.OK then
-		logger:info("OK key released")
+		self:dispatchEvent({name = KEY_EVENT.OK_RELEASED})
 	else
 		logger:warn(key, "没注册事件监听")
 	end
