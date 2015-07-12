@@ -8,6 +8,7 @@ KEY = {
 	RIGHT = cc.KeyCode.KEY_DPAD_RIGHT,
 	UP = cc.KeyCode.KEY_DPAD_UP,
 	DOWN = cc.KeyCode.KEY_DPAD_DOWN,
-	OK = cc.KeyCode.KEY_DPAD_CENTER,
-	MENU = cc.KeyCode.KEY_MENU
+	OK = cc.KeyCode.KEY_ENTER,
+	MENU = cc.KeyCode.KEY_MENU,
+	BACK = cc.KeyCode.KEY_BACK
 }

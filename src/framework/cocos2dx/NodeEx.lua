@@ -371,7 +371,7 @@ local function KeypadEventCodeConvert( code )
     local key
     if code==6 then
         key = "back"
-    elseif code==16 then
+    elseif code==18 then
         key = "menu"
     else
         key = tostring(code)

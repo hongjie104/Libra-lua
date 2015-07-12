@@ -66,7 +66,7 @@ function JButton:enabled(bool)
 end
 
 --- 触发点击事件
-function JButton:doClick()
+function JButton:doAction()
 	self:dispatchEvent({name = BUTTON_EVENT.CLICKED})
 end
 
@@ -105,7 +105,7 @@ function JButton:onTouch(evt)
 		end
 		if self:isPointIn(evt.x, evt.y) then
 			self:onTouchEnded(evt)
-			self:doClick()
+			self:doAction()
 		end
 		self._isTouchMoved = false
 	end

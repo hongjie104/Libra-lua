@@ -24,7 +24,7 @@ end
 
 function JMsgPanel:show(container)
 	if not self._isShowing then
-		container = container or libraUIManager:getUIContainer()
+		container = container or uiManager:getUIContainer()
 		local size = container:getContentSize()
 		self:pos(size.width / 2, size.height / 2):addToContainer(container)
 		self._isShowing = true

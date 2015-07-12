@@ -25,9 +25,10 @@ function LibraToolbar:ctor(container, goBackCallback)
 		},
 		{
 			func = function (event)
-				self:goBack()
+				-- require("libra.debug.DebugPanel").new():show(self._container)
+				-- self:goBack()
 			end,
-			label = {text = "dsfd"}
+			label = {text = "debug"}
 		}
 	}
 

@@ -8,6 +8,8 @@ DATA_CONFIG_PACKAGE = DATA_CONFIG_PACKAGE or "app.config."
 
 import(".lang")
 
+localDump = import(".LocalDump").new()
+
 --===========================================================================================
 
 --- 使用二分法查找
@@ -41,11 +43,11 @@ end
 
 --- 根据type读取相应的配置文件
 -- @param propType 物品Type
--- @param configType 配置文件，取lua文件名
+-- @param configName 配置文件，取lua文件名
 -- @return 返回配置文件中物品的配置信息
-function getConfig(propType, configType, compareStr)
+function getConfig(propType, configName, compareStr)
 	compareStr = compareStr and compareStr or 'ID'
-	local config = require(DATA_CONFIG_PACKAGE .. configType)
+	local config = require(DATA_CONFIG_PACKAGE .. configName)
 	if config then
 		return queryByType(config, compareStr, checkint(propType))
 	end
@@ -55,11 +57,9 @@ end
 
 --- 清除无用纹理
 function releaseCaches()
-	-- logger:info("清除了没有用到的纹理")
-	-- cc.AnimationCache:purgeSharedAnimationCache()
-	-- cc.SpriteFrameCache:getInstance():removeUnusedSpriteFrames()
-	-- CCTextureCache:sharedTextureCache():removeUnusedTextures()
-	-- CCArmatureDataManager:purge()
+	logger:info("清除了没有用到的纹理")
+	cc.AnimationCache:destroyInstance()
+	display.removeUnusedSpriteFrames()
 end
 
 --===========================================================================================
@@ -69,11 +69,17 @@ function sceneOnEnter(scene)
 	releaseCaches()
 
 	-- 添加UI层
-	libraUIManager:getUIContainer():addTo(scene)
+	local uiContainer = uiManager:getUIContainer()
+	if uiContainer:getParent() ~= nil then
+		uiContainer:removeFromParent(false)
+	end
+	uiContainer:addTo(scene, 999)
+
 	if LUA_UI_EDITOR then
 		import("libra.uiEditor.UIEditorContainer").new():addToContainer()
 	end
 
+	----[[
 	if device.platform == "android" then
 		-- avoid unmeant back
 		scene:performWithDelay(function()
@@ -86,30 +92,24 @@ function sceneOnEnter(scene)
 			scene:addChild(layer)
 		end, 0.5)
 	end
+	--]]
 end
 
 function sceneOnExit(scene)
 	-- 清除数据
-	-- CCArmatureDataManager:purge()
+	ccs.ArmatureDataManager:destroyInstance()
 	-- SceneReader:sharedSceneReader():purge()
 	-- ActionManager:purge()
-	
 	-- GUIReader:purge()
-	-- skeletonDataPool:clearTmpSkeletonData()
-	-- if msgPanelList then
-	-- 	for i, v in ipairs(msgPanelList) do
-	-- 		v:close()
-	-- 	end
-	-- 	msgPanelList = { }
-	-- end
 end
 
 function sceneOnEnterTransitionFinish(scene)
-	focusManager:init()
+	-- focusManager:init()
 end
 
 --===========================================================================================
 
+--- 获取带有中文的string的长度
 function getStringLength(str)
 	if str == "" then
 		return 0

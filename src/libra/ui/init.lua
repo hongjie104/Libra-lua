@@ -33,25 +33,8 @@ local function name(self, str)
 	return self._name
 end
 
--- local function showBorder(self)
--- 	if self._border then
--- 		self._border:setVisible(true)
--- 	else
--- 		-- self._border = display.newRect(cc.rect(self._actualWidth / -2, self._actualHeight / -2, self._actualWidth, self._actualHeight), 
--- 		-- 	{borderColor = cc.c4f(0,1,0,1)}):addTo(self)
--- 		self._border = display.newScale9Sprite("uiEditor/border.png", 0, 0, self:getContentSize()):addTo(self)
--- 	end
--- 	return self
--- end
-
-local function closeBorder(self)
-	if self._border then
-		self._border:setVisible(false)
-	end
-end
-
 local function addToContainer(self, container, zOrder)
-	local container = container or libraUIManager:getUIContainer()
+	local container = container or uiManager:getUIContainer()
 	assert(type(container.isContainer) == "function" and container:isContainer(), "libra.ui.init.addToContainer() - invalid container")
 	if container ~= self then
 		container:addUIComponent(self, zOrder)
@@ -69,46 +52,104 @@ local function removeSelf(self)
 	return self
 end
 
+--- 获得焦点
+local function gainFocus(self)
+	if not self._border then
+		local border = display.newScale9Sprite("ui/border.png", self:actualWidth() / 2, self:actualHeight() / 2, cc.size(self:actualWidth(), self:actualHeight()))
+		border:addTo(self)
+		self._border = border
+	end
+end
+
+--- 失去焦点
+local function lostFocus(self)
+	if self._border then
+		self._border:removeSelf()
+		self._border = nil
+	end
+end
+
+local function leftComponent(self, component)
+	if component then
+		if component._isuiComponent then
+			self._leftComponent = component
+		else
+			logger:error(component:name(), "is not Libra UI Component")
+		end
+	else
+		return self._leftComponent
+	end
+end
+
+local function rightComponent(self, component)
+	if component then
+		if component._isuiComponent then
+			self._rightComponent = component
+		else
+			logger:error(component:name(), "is not Libra UI Component")
+		end
+	else
+		return self._rightComponent
+	end
+end
+
+local function topComponent(self, component)
+	if component then
+		if component._isuiComponent then
+			self._topComponent = component
+		else
+			logger:error(component:name(), "is not Libra UI Component")
+		end
+	else
+		return self._topComponent
+	end
+end
+
+local function bottomComponent(self, component)
+	if component then
+		if component._isuiComponent then
+			self._bottomComponent = component
+		else
+			logger:error(component:name(), "is not Libra UI Component")
+		end
+	else
+		return self._bottomComponent
+	end
+end
+
 function makeUIComponent(component)
-    component:setCascadeOpacityEnabled(true)
-    component:setCascadeColorEnabled(true)
+	component._isuiComponent = true
 
-    component._actualWidth, component._actualHeight = 0, 0
-    component.actualWidth = actualWidth
-    component.actualHeight = actualHeight
+	component:setCascadeOpacityEnabled(true)
+	component:setCascadeColorEnabled(true)
 
-    local size = component:getContentSize()
+	component._actualWidth, component._actualHeight = 0, 0
+	component.actualWidth = actualWidth
+	component.actualHeight = actualHeight
+
+	local size = component:getContentSize()
 	component:actualWidth(size.width)
 	component:actualHeight(size.height)
 
 	component._name = component.class.__cname
-    component.name = name
+	component.name = name
+	
+	component.addToContainer = addToContainer
+	component.removeSelf = removeSelf
 
-    -- component.showBorder = showBorder
-    component.closeBorder = closeBorder
-    component.addToContainer = addToContainer
-    component.removeSelf = removeSelf
+	-- 焦点相关
+	component.gainFocus = gainFocus
+	component.lostFocus = lostFocus
+	component.leftComponent = leftComponent
+	component.rightComponent = rightComponent
+	component.topComponent = topComponent
+	component.bottomComponent = bottomComponent
 end
 
 import(".event")
-
-Direction = {
-	BOTH = 0,
-	VERTICAL = 1,
-	HORIZONTAL = 2,
-	LEFT_TO_RIGHT = 3,
-	RIGHT_TO_LEFT = 4,
-	TOP_TO_BOTTOM = 5,
-	BOTTOM_TO_TOP = 6
-}
-
-TAG = {
-	COUNT_TAG       = "Count",
-	CELL_TAG        = "Cell",
-	UNLOAD_CELL_TAG = "UnloadCell"
-}
+import(".uiConstants")
 
 UI_CONFIG = UI_CONFIG or { }
 
-libraUIManager = require("libra.ui.managers.UIManager").new()
-focusManager = require("libra.ui.managers.FocusManager").new()
+uiManager = require(UI_MANAGER_PATH or "libra.ui.managers.UIManager").new()
+-- focusManager = require("libra.ui.managers.FocusManager").new()
