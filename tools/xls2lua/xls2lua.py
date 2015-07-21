@@ -14,7 +14,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-import getopt, xlrd, os, os.path, json
+import getopt, xlrd, os, os.path, json, types
 
 def errorHelp():
 	print(u"发生了一些错误,请输入python xls2lua.py -h来获取帮助");
@@ -35,10 +35,95 @@ xls中
 python xls2lua.py -i D:\\apowo\\ProjectS\\config\\TypeDatas -o D:\\apowo\\ProjectS\\client\\trunk\\projects\\scripts\\app\\config
 """
 
+def getColName(index):
+	colName = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+		"AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ",
+		"BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BX", "BY", "BZ",
+		"CA", "CB", "CC", "CD", "CE", "CF", "CG", "CH", "CI", "CJ", "CK", "CL", "CM", "CN", "CO", "CP", "CQ", "CR", "CS", "CT", "CU", "CV", "CW", "CX", "CY", "CZ"]
+	return colName[index]
+
+def space_str(layer):
+	lua_str = ""
+	for i in range(0, layer):
+		lua_str += '\t'
+	return lua_str
+
+def dic_to_lua_str(data, layer = 0, isFormat = False):
+	d_type = type(data)
+	if  d_type is types.StringTypes or d_type is str or d_type is types.UnicodeType:
+		return "'" + data + "'"
+	elif d_type is types.BooleanType:
+		if data:
+			return 'true'
+		else:
+			return 'false'
+	elif d_type is types.IntType or d_type is types.LongType or d_type is types.FloatType:
+		return str(data)
+	elif d_type is types.ListType:
+		if isFormat:
+			lua_str = "{\n"
+			lua_str += space_str(layer + 1)
+		else:
+			lua_str = "{"
+
+		for i in range(0, len(data)):
+			lua_str += dic_to_lua_str(data[i], layer + 1, isFormat)
+			if i < len(data) - 1:
+				lua_str += ','
+		if isFormat:
+			lua_str += '\n'
+			lua_str += space_str(layer)
+		lua_str +=  '}'
+		return lua_str
+	elif d_type is types.DictType:
+		lua_str = ''
+		if isFormat:
+			lua_str += "\n"
+			lua_str += space_str(layer)
+			lua_str += "{\n"
+		else:
+			lua_str += "{"
+		data_len = len(data)
+		data_count = 0
+		for k,v in data.items():
+			data_count += 1
+			if isFormat:
+				lua_str += space_str(layer+1)
+			if type(k) is types.IntType:
+				lua_str += '[' + str(k) + ']'
+			else:
+				lua_str += k 
+			lua_str += ' = '
+			try:
+				lua_str += dic_to_lua_str(v,layer + 1, isFormat)
+				if data_count < data_len:
+					if isFormat:
+						lua_str += ',\n'
+					else:
+						lua_str += ','
+
+			except Exception, e:
+				print 'error in ', k, v
+				raise
+		if isFormat:
+			lua_str += '\n'
+			lua_str += space_str(layer)
+		lua_str += '}'
+		return lua_str
+	else:
+		print d_type , 'is error'
+		return None
+
 def readXls(xlsPath, xlsName):
-	xlsfile = xlrd.open_workbook(xlsPath)
+	try:
+		xlsfile = xlrd.open_workbook(xlsPath)
+	except Exception, e:
+		print("[ERROR] => get data from %s faild" % xlsPath)
+		raise e
 	# 根据索引来获取sheet
 	mysheet = xlsfile.sheet_by_index(0)
+	# for x in xrange(0, mysheet.ncols):
+	# 	print(mysheet.cell(1, x), getColName(x), x)
 	# 根据第一行内容找出需要输出到lua的列的索引,只有0和2才是要输出到lua中的
 	colIndexList = [col for col in range(mysheet.ncols) if mysheet.cell(1, col).value == 0.0 or mysheet.cell(1, col).value == 2.0]
 	# colIndexList = [col for col in range(mysheet.ncols)]
@@ -52,22 +137,48 @@ def readXls(xlsPath, xlsName):
 		for rownum in range(4, mysheet.nrows):
 			row = mysheet.row_values(rownum)
 			if row:
-				app = { }
+				rowData = { }
 				for i in range(len(colnames)):
-					if dataTypes[i] == "int":
-						try:
-							app[colnames[i]] = int(row[i])
-						except Exception, e:
-							print(u"\n[ERROR] => %s中第%s行第%s列的数据类型不是int\n" % (xlsPath, rownum + 1, i + 1))
-							raise e
-					elif dataTypes[i] == "string":
-						app[colnames[i]] = "'%s'" % row[i]
-					elif dataTypes[i] == "json":
-						app[colnames[i]] = row[i].replace("\"", "").replace("[", "{").replace("]", "}").replace(":", "=")
-					else:						
-						app[colnames[i]] = "'%s'" % row[i]
-						print(u"n[WARN] => %s中第%s行第%s列的数据类型不确定是否正确\n" % (xlsPath, rownum + 1, i + 1))
-				dataList.append(app)
+					if i in colIndexList:
+						if dataTypes[i].lower() == "int":
+							try:
+								if row[i] == '':
+									rowData[colnames[i]] = 0
+								else:	
+									rowData[colnames[i]] = int(row[i])
+							except Exception, e:
+								print(u"\n[ERROR] => %s中第%s行第%s列的数据类型不是int\n" % (xlsPath, rownum + 1, getColName(i)))
+								raise e
+						elif dataTypes[i].lower() == "float":
+							try:
+								if row[i] == '':
+									rowData[colnames[i]] = 0
+								else:	
+									rowData[colnames[i]] = float(row[i])
+							except Exception, e:
+								print(u"\n[ERROR] => %s中第%s行第%s列的数据类型不是float\n" % (xlsPath, rownum + 1, getColName(i)))
+								raise e
+						elif dataTypes[i].lower() == "string":
+							rowData[colnames[i]] = "'%s'" % row[i]
+						elif dataTypes[i].lower() == "json":
+							try:
+								rowData[colnames[i]] = dic_to_lua_str(json.loads(row[i])).replace(" ", "")
+							except Exception, e:
+								print(u"\n[ERROR] => %s中第%s行第%s列的数据类型不是json\n" % (xlsPath, rownum + 1, getColName(i)))
+								raise e
+						elif dataTypes[i].lower().startswith("split"):
+							# 需要用特殊符号分割
+							splitChar = dataTypes[i].replace("split", "")
+							arr = str(row[i]).split(splitChar)
+							rowData[colnames[i]] = "{"
+							if len(arr) > 1 or arr[0] != "":
+								for v in arr:
+									rowData[colnames[i]] += v + ","
+							rowData[colnames[i]] += "}"
+						else:
+							rowData[colnames[i]] = "'%s'" % row[i]
+							print(u"n[WARN] => %s中第%s行第%s列的数据类型不确定是否正确:%s\n" % (xlsPath, rownum + 1, getColName(i), dataTypes[i]))
+				dataList.append(rowData)
 				# 按照ID从小到大排序
 				sortKey = 'ID'
 				if dataList[0].has_key('Lv'):
@@ -89,21 +200,25 @@ def readXls(xlsPath, xlsName):
 
 		# 然后保存到硬盘中
 		try:
-			fileHandle = open("%s%s.lua" % (luaDir, xlsName), 'w')
-			fileHandle.write(luaText)			
+			fileHandle = open("%s%sConfig.lua" % (luaDir, xlsName), 'w')
+			fileHandle.write(luaText)
+			print("INFO =>" + xlsName + u"转换成功")
 		except Exception, e:
-			print("ERROR=====>" + filename + u"转换失败", e)
+			print("ERROR =>" + xlsName + u"转换失败", e)
 			# raise e
 		finally:
 			fileHandle.close()
 
 
 def toLua(xlsDir):
+	# xlsList = ["Warrior.xls", "Items.xls", "Skill.xlsx", "LevelScene.xlsx"]
 	for parent, dirnames, filenames in os.walk(xlsDir):
 		for filename in filenames:
-			extension = os.path.splitext(filename)[1]
-			if extension == ".xls" or extension == ".xlsx":
-				readXls(os.path.join(parent, filename), os.path.splitext(filename)[0])
+			# if filename in xlsList:
+			if not filename.startswith("~"):
+				extension = os.path.splitext(filename)[1]
+				if extension == ".xls" or extension == ".xlsx":
+					readXls(os.path.join(parent, filename), os.path.splitext(filename)[0])
 def main():
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], "hi:o:", ["help", "input=", "output="])

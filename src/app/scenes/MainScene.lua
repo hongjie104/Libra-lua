@@ -22,7 +22,7 @@ function MainScene:ctor()
 					{id = "_testBtn", ui = "libra.ui.components.JButton", param = {normal = "ui/ty_anniu02.png", label = {text = "123", size = 24}}, x = display.cx, y = display.cy},
 					{id = "_testBtn1", ui = "libra.ui.components.JButton", param = {normal = "ui/ty_anniu02.png", label = {text = "hello world", size = 24}}, x = display.cx, y = display.cy + 50}
 				}
-	libraUIManager:getUIContainer():createUI(test)
+	uiManager:getUIContainer():createUI(test)
 	
 	--[[
 	local node = JImage.new("COVER.jpg"):align(display.CENTER, 400, 400)
@@ -68,12 +68,12 @@ function MainScene:ctor()
 	self._numScroller = JNumberScroller.new():addToContainer():pos(display.cx, display.cy)
 	self._numScroller:curNum(258)
 
-	libraUIManager:getUIContainer()._testBtn:addEventListener(BUTTON_EVENT.CLICKED, function ()
+	uiManager:getUIContainer()._testBtn:addEventListener(BUTTON_EVENT.CLICKED, function ()
 		local ff = math.random(999)
 		print(ff)
 		self._numScroller:scrollTo(ff)
 	end)
-	libraUIManager:getUIContainer()._testBtn1:addEventListener(BUTTON_EVENT.CLICKED, function ()
+	uiManager:getUIContainer()._testBtn1:addEventListener(BUTTON_EVENT.CLICKED, function ()
 		self._socket = require("libra.net.socket.SocketHandler").new()
 		self._socket:startConnect("test003243", "asd")
 		logger:info("gggggggggggggggg")
