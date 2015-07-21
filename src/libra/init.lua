@@ -32,7 +32,7 @@ function Node:x(int)
 		self:setPosition(cc.p(int, self:y()))
 		return self
 	end
-    return self:getPositionX()
+	return self:getPositionX()
 end
 
 function Node:y(int)
@@ -40,7 +40,7 @@ function Node:y(int)
 		self:setPosition(cc.p(self:x(), int))
 		return self
 	end
-    return self:getPositionY()
+	return self:getPositionY()
 end
 
 function Node:addXY(x, y)

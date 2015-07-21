@@ -9,6 +9,7 @@ local JPanel = class("JPanel", require("libra.ui.components.JContainer"))
 
 -- @param param {bg="背景图", size = cc.size() or nil, capInsets = cc.rect() or nil, closeBtnParam = "关闭按钮参数" or nil}
 function JPanel:ctor(param)
+	param = param or { }
 	JPanel.super.ctor(self, param)
 	-- 添加一个有色layer以吞噬掉触摸事件，顺带可以支持面板有一个全屏的背景色
 	local cc4b = param.bgColor or cc.c4b(0, 0, 0, 0)
@@ -17,26 +18,59 @@ function JPanel:ctor(param)
 	if self._param.closeBtnParam then
 		self._closeBtn = Button.new(self._param.closeBtnParam):addToContainer(self):pos(self._actualWidth, self._actualHeight)
 		self._closeBtn:addEventListener(BUTTON_EVENT.CLICKED, function ()
-				self:close()
+				uiManager:back()
 			end)
 	end
 
 	self._isShowing = false
 	self:setNodeEventEnabled(true)
-	self:align(display.CENTER, display.cx, display.cy)
 end
 
-function JPanel:show(container)
+function JPanel:show(animation, container)
 	if not self._isShowing then
 		self:addToContainer(container)
 		self._isShowing = true
-		self:scale(.2)
-		transition.scaleTo(self, {time = .3, scale = 1, easing = "BACKOUT"})
+		if animation then
+			if type(self[animation]) == "function" then
+				self[animation](self)
+			end
+		end
 	end
 	return self
 end
 
-function JPanel:close()
+--- 从中心向外展开
+-- @private
+function JPanel:showFromCenter()
+	self:scale(.2)
+	transition.scaleTo(self, {time = .3, scale = 1, easing = "BACKOUT"})
+end
+
+--- 从上面飞下来
+-- @private
+function JPanel:showFromTop()
+	self:y(self._actualHeight / 2 + display.height)
+	transition.moveTo(self, {time = .3, y = display.cy, easing = "BACKOUT"})
+end
+
+--- 从左边飞来
+-- @private
+function JPanel:showFromLeft()
+	self:x(self._actualWidth / -2 - display.width)
+	transition.moveTo(self, {time = .3, x = display.cx, easing = "BACKOUT"})
+end
+
+--- 从右边飞来
+-- @private
+function JPanel:showFromLeft()
+	self:x(self._actualWidth / 2 + display.width)
+	transition.moveTo(self, {time = .3, x = display.cx, easing = "BACKOUT"})
+end
+
+--- 关闭面板
+-- @param animation 关闭的动画
+-- @param direct 是否直接关闭，不播放关闭动画
+function JPanel:close(animation, direct)
 	if self._isShowing then
 		self._isShowing = false
 		-- 之所以在关闭前把所有组件都unscheduleUpdate一下
@@ -47,11 +81,21 @@ function JPanel:close()
 				v:unscheduleUpdate()
 			end
 		end
-		transition.scaleTo(self, {time = .2, scale = .5, easing = "BACKIN", onComplete = function ()
+		if not direct and animation and type(self[animation]) == "function" then
+			self[animation](self)
+		else
 			self:removeSelf()
-		end})
+		end
 	end
 	return self
+end
+
+--- 从中心向里关闭
+-- @private
+function JPanel:closeFromCenter()
+	transition.scaleTo(self, {time = .2, scale = .5, easing = "BACKIN", onComplete = function ()
+		self:removeSelf()
+	end})
 end
 
 function JPanel:setSize(width, height)

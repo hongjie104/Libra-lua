@@ -8,6 +8,10 @@ DATA_CONFIG_PACKAGE = DATA_CONFIG_PACKAGE or "app.config."
 
 import(".lang")
 
+local scheduler = require("framework.scheduler")
+
+localDump = import(".LocalDump").new()
+
 --===========================================================================================
 
 --- 使用二分法查找
@@ -55,11 +59,9 @@ end
 
 --- 清除无用纹理
 function releaseCaches()
-	-- logger:info("清除了没有用到的纹理")
-	-- cc.AnimationCache:purgeSharedAnimationCache()
-	-- cc.SpriteFrameCache:getInstance():removeUnusedSpriteFrames()
-	-- CCTextureCache:sharedTextureCache():removeUnusedTextures()
-	-- CCArmatureDataManager:purge()
+	logger:info("清除了没有用到的纹理")
+	cc.AnimationCache:destroyInstance()
+	display.removeUnusedSpriteFrames()
 end
 
 --===========================================================================================
@@ -69,7 +71,12 @@ function sceneOnEnter(scene)
 	releaseCaches()
 
 	-- 添加UI层
-	libraUIManager:getUIContainer():addTo(scene)
+	local uiContainer = uiManager:getUIContainer()
+	if uiContainer:getParent() ~= nil then
+		uiContainer:removeFromParent(false)
+	end
+	uiContainer:addTo(scene, 999)
+
 	if LUA_UI_EDITOR then
 		import("libra.uiEditor.UIEditorContainer").new():addToContainer()
 	end
@@ -92,26 +99,19 @@ end
 
 function sceneOnExit(scene)
 	-- 清除数据
-	-- CCArmatureDataManager:purge()
+	ccs.ArmatureDataManager:destroyInstance()
 	-- SceneReader:sharedSceneReader():purge()
 	-- ActionManager:purge()
-	
 	-- GUIReader:purge()
-	-- skeletonDataPool:clearTmpSkeletonData()
-	-- if msgPanelList then
-	-- 	for i, v in ipairs(msgPanelList) do
-	-- 		v:close()
-	-- 	end
-	-- 	msgPanelList = { }
-	-- end
 end
 
 function sceneOnEnterTransitionFinish(scene)
-	focusManager:init()
+	-- focusManager:init()
 end
 
 --===========================================================================================
 
+--- 获取带有中文的string的长度
 function getStringLength(str)
 	if str == "" then
 		return 0
@@ -184,6 +184,13 @@ end
 
 --===========================================================================================
 
+function getNumberLength(num)
+	if num == 0 then return 0 end
+	return 1 + getNumberLength(checkint(num / 10))
+end
+
+--===========================================================================================
+
 --- 序列化一个对象
 function serialize(obj)
 	local lua = ""
@@ -243,4 +250,47 @@ function unserialize(lua)
 	if func then
 		return func()
 	end
+end
+
+--===========================================================================================
+
+local shakeNode = nil
+local shakeHandler = nil
+local isShakeing = false
+local shakeAry = nil
+local totalShake, curShake = 0, 1
+local shakeNodeX, shakeNodeY = 0, 0
+
+function stopShake()
+	curShake = 1
+	if shakeHandler then
+		scheduler.unscheduleGlobal(shakeHandler)
+		shakeHandler = nil
+		shakeNode:pos(shakeNodeX, shakeNodeY)
+	end
+end
+
+function shaking()
+	if shakeNode then
+		shakeNode:pos(shakeNodeX + shakeAry[curShake][1], shakeNodeY + shakeAry[curShake][2])
+		curShake = curShake + 1
+		if curShake > totalShake then
+			stopShake()	
+		end
+	else
+		stopShake()
+	end
+end
+
+--- 震动
+function shake(node)
+	shakeAry = { }
+	for i = 1, 8 do
+		shakeAry[i] = {math.random(-20, 20), math.random(-20, 20)}
+	end
+	totalShake, curShake = #shakeAry, 1
+	shakeNode = node
+	shakeNodeX = shakeNode:x()
+	shakeNodeY = shakeNode:y()
+	shakeHandler = scheduler.scheduleGlobal(shaking, .1)
 end

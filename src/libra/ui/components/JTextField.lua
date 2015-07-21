@@ -7,15 +7,15 @@ JTextField = class("JTextField", function (param)
 	if param.isEditBox then
 		return JTextField.newEditBox(param)
 	else
-        return JTextField.newTextField(param)
+		return JTextField.newTextField(param)
 	end
 end)
 
 function JTextField:ctor(param)
-    makeUIComponent(self)
-    if not param.isEditBox then
-        self.getText = self.getStringValue
-    end
+	makeUIComponent(self)
+	if not param.isEditBox then
+		self.getText = self.getStringValue
+	end
 end
 
 --[[--
@@ -34,21 +34,21 @@ end
 ~~~ lua
 
 local function onEdit(event, editbox)
-    if event == "began" then
-        -- 开始输入
-    elseif event == "changed" then
-        -- 输入框内容发生变化
-    elseif event == "ended" then
-        -- 输入结束
-    elseif event == "return" then
-        -- 从输入框返回
-    end
+	if event == "began" then
+		-- 开始输入
+	elseif event == "changed" then
+		-- 输入框内容发生变化
+	elseif event == "ended" then
+		-- 输入结束
+	elseif event == "return" then
+		-- 从输入框返回
+	end
 end
 
 local editbox = ui.newEditBox({
-    image = "EditBox.png",
-    listener = onEdit,
-    size = cc.size(200, 40)
+	image = "EditBox.png",
+	listener = onEdit,
+	size = cc.size(200, 40)
 })
 
 ~~~
@@ -75,7 +75,7 @@ editbox:setText(string.trim(editbox:getText()))
 local _text = editbox:getText()
 local _trimed = string.trim(_text)
 if _trimed ~= _text then
-    editbox:setText(_trimed)
+	editbox:setText(_trimed)
 end
 
 ~~~
@@ -86,38 +86,38 @@ end
 
 ]]
 function JTextField.newEditBox(param)
-    local imageNormal = param.image
-    local imagePressed = param.imagePressed
-    local imageDisabled = param.imageDisabled
+	local imageNormal = param.image
+	local imagePressed = param.imagePressed
+	local imageDisabled = param.imageDisabled
 
-    if type(imageNormal) == "string" then
-        imageNormal = display.newScale9Sprite(imageNormal)
-    end
-    if type(imagePressed) == "string" then
-        imagePressed = display.newScale9Sprite(imagePressed)
-    end
-    if type(imageDisabled) == "string" then
-        imageDisabled = display.newScale9Sprite(imageDisabled)
-    end
+	if type(imageNormal) == "string" then
+		imageNormal = display.newScale9Sprite(imageNormal)
+	end
+	if type(imagePressed) == "string" then
+		imagePressed = display.newScale9Sprite(imagePressed)
+	end
+	if type(imageDisabled) == "string" then
+		imageDisabled = display.newScale9Sprite(imageDisabled)
+	end
 
-    local editboxCls
-    if cc.bPlugin_ then
-        editboxCls = ccui.EditBox
-    else
-        editboxCls = cc.EditBox
-    end
-    local editbox = editboxCls:create(param.size, imageNormal, imagePressed, imageDisabled)
+	local editboxCls
+	if cc.bPlugin_ then
+		editboxCls = ccui.EditBox
+	else
+		editboxCls = cc.EditBox
+	end
+	local editbox = editboxCls:create(param.size, imageNormal, imagePressed, imageDisabled)
 
-    if editbox then
-        if param.listener then
-            editbox:registerScriptEditBoxHandler(param.listener)
-        end
-        if param.x and param.y then
-            editbox:setPosition(param.x, param.y)
-        end
-    end
+	if editbox then
+		if param.listener then
+			editbox:registerScriptEditBoxHandler(param.listener)
+		end
+		if param.x and param.y then
+			editbox:setPosition(param.x, param.y)
+		end
+	end
 
-    return editbox
+	return editbox
 end
 
 --[[--
@@ -140,21 +140,21 @@ end
 ~~~ lua
 
 local function onEdit(textfield, eventType)
-    if event == 0 then
-        -- ATTACH_WITH_IME
-    elseif event == 1 then
-        -- DETACH_WITH_IME
-    elseif event == 2 then
-        -- INSERT_TEXT
-    elseif event == 3 then
-        -- DELETE_BACKWARD
-    end
+	if event == 0 then
+		-- ATTACH_WITH_IME
+	elseif event == 1 then
+		-- DETACH_WITH_IME
+	elseif event == 2 then
+		-- INSERT_TEXT
+	elseif event == 3 then
+		-- DELETE_BACKWARD
+	end
 end
 
 local textfield = UIInput.new({
-    UIInputType = 2,
-    listener = onEdit,
-    size = cc.size(200, 40)
+	UIInputType = 2,
+	listener = onEdit,
+	size = cc.size(200, 40)
 })
 
 ~~~
@@ -165,51 +165,51 @@ local textfield = UIInput.new({
 
 ]]
 function JTextField.newTextField(param)
-    local textfieldCls
-    if cc.bPlugin_ then
-        textfieldCls = ccui.TextField
-    else
-        textfieldCls = cc.TextField
-    end
-    local editbox = textfieldCls:create()
-    editbox:setPlaceHolder(param.placeHolder)
-    if param.x and param.y then
-        editbox:setPosition(param.x, param.y)
-    end    
-    if param.listener then
-        editbox:addEventListener(param.listener)
-    end
-    if param.size then
-        editbox:setTextAreaSize(param.size)
-    end
-    if param.text then
-        if editbox.setString then
-            editbox:setString(param.text)
-        else
-            editbox:setText(param.text)
-        end
-    end
-    if param.font then
-        editbox:setFontName(param.font)
-    end
-    if param.fontSize then
-        editbox:setFontSize(param.fontSize)
-    end
-    if param.maxLength and 0 ~= param.maxLength then
-        editbox:setMaxLengthEnabled(true)
-        editbox:setMaxLength(param.maxLength)
-    end
-    if param.passwordEnable then
-        editbox:setPasswordEnabled(true)
-    end
-    if param.passwordChar then
-        editbox:setPasswordStyleText(param.passwordChar)
-    end
-    -- if param.bg then
-    --     editbox:addChild(display.newSprite(param.bg), -1)
-    -- end
+	local textfieldCls
+	if cc.bPlugin_ then
+		textfieldCls = ccui.TextField
+	else
+		textfieldCls = cc.TextField
+	end
+	local editbox = textfieldCls:create()
+	editbox:setPlaceHolder(param.placeHolder)
+	if param.x and param.y then
+		editbox:setPosition(param.x, param.y)
+	end	
+	if param.listener then
+		editbox:addEventListener(param.listener)
+	end
+	if param.size then
+		editbox:setTextAreaSize(param.size)
+	end
+	if param.text then
+		if editbox.setString then
+			editbox:setString(param.text)
+		else
+			editbox:setText(param.text)
+		end
+	end
+	if param.font then
+		editbox:setFontName(param.font)
+	end
+	if param.fontSize then
+		editbox:setFontSize(param.fontSize)
+	end
+	if param.maxLength and 0 ~= param.maxLength then
+		editbox:setMaxLengthEnabled(true)
+		editbox:setMaxLength(param.maxLength)
+	end
+	if param.passwordEnable then
+		editbox:setPasswordEnabled(true)
+	end
+	if param.passwordChar then
+		editbox:setPasswordStyleText(param.passwordChar)
+	end
+	-- if param.bg then
+	--	 editbox:addChild(display.newSprite(param.bg), -1)
+	-- end
 
-    return editbox
+	return editbox
 end
 
 return JTextField

@@ -6,7 +6,6 @@
 local scheduler = require("framework.scheduler")
 local SocketTCP = require('framework.cc.net.SocketTCP')
 local LineSelecter = import('.LineSelecter')
-local protoBufLabel = import(".protoBufLua")
 
 local function getBaseByteArray()
 	local utils = require("framework.cc.utils.init")
@@ -30,12 +29,10 @@ function SocketHandler:ctor()
 	-- 注册协议文件，这样谷歌协议才能被解析
 	local pbPath = "res/sound/bg.mp3"
 	if device.platform == 'android' then
-		-- pbPath = CCFileUtils:sharedFileUtils():fullPathForFilename('sound/bg.mp3')
 		pbPath = cc.FileUtils:getInstance():fullPathForFilename('sound/bg.mp3')
 	end
 	
-	if cc.FileUtils:getInstance():isFileExist(pbPath) then
-		-- protobuf.register(CCFileUtils:sharedFileUtils():getFileData(pbPath))
+	if device.platform == "windows" or cc.FileUtils:getInstance():isFileExist(pbPath) then
 		protobuf.register(cc.HelperFunc:getFileData(pbPath))
 	else
 		logger:error("找不到协议:", pbPath)
@@ -52,6 +49,8 @@ function SocketHandler:ctor()
 	-- 此时索引值自增1
 	self._protoIndex = 1
 
+	self._protoPackage = "PS.ProtoBuf."
+
 	self:registerOpCodeHandler(10, self.onReconnect)
 	self:registerOpCodeHandler(11, self.onCommandResult)
 end
@@ -63,7 +62,7 @@ end
 
 --- 解析协议
 function SocketHandler:decode(pbName, msg)
-	return protobuf.decode("PS.ProtoBuf." .. pbName, msg)
+	return protobuf.decode(self._protoPackage .. pbName, msg)
 end
 
 --- 加密协议
@@ -75,7 +74,7 @@ end
 --- 当再次收到消息A时，假如其中的可选参数是空，那么将会以上一次的值进行赋值。
 --- 所以需要清空缓存，以保证每次收到消息A时，参数都是实时的
 function SocketHandler:clearDefaultCache(pbName)
-	return protobuf.clearDefaultCache("PS.ProtoBuf." .. pbName)
+	return protobuf.clearDefaultCache(self._protoPackage .. pbName)
 end
 
 --- 建立连接,该方法只在登录界面中的登录按钮事件中响应
@@ -186,11 +185,11 @@ function SocketHandler:onData(event)
 				self:discardCurrentMsg(false)
 				-- print("package length: " .. self._length)
 			end
-			--logger:info("self._length: " .. self._length .. " available: " .. self._buf:getAvailable())
+			-- logger:info("self._length: " .. self._length .. " available: " .. self._buf:getAvailable())
 		end
 		-- 如果包长小于缓冲区可读数据长度，说明包数据还没完全发过来，等发过来再继续读。
 		if self._length > self._buf:getAvailable() then
-			--logger:info("break: self._length: " .. self._length)
+			-- logger:info("break: self._length: " .. self._length)
 			break
 		end
 		self:processData()
@@ -222,26 +221,16 @@ function SocketHandler:discardCurrentMsg(resetLength)
 end
 
 function SocketHandler:processData()
-	if self._isTest then
-		for i = 1, self._length / 4 do
-			local val = self._buf:readInt()
-			if val ~= i then
-				logger:error("接受数据错误！")
-			end
+	local opCode = self._buf:readInt()
+	local msg = self._buf:readStringBytes(self._length - 4)
+	local handlerList = self._opCodeHandler[opCode]
+	if handlerList ~= nil then
+		logger:info('开始解析谷歌协议:', self:getProtoBufLabel(opCode), "opCode = ", opCode)
+		for i,v in ipairs(handlerList) do
+			v(self, msg)
 		end
-		logger:warn("数据处理完成")
-	else -- 真正的业务逻辑
-		local opCode = self._buf:readInt()
-		local msg = self._buf:readStringBytes(self._length - 4)
-		local handlerList = self._opCodeHandler[opCode]
-		if handlerList ~= nil then
-			logger:info('开始解析谷歌协议:', protoBufLabel[opCode], "opCode = ", opCode)
-			for i,v in ipairs(handlerList) do
-				v(self, msg)
-			end
-		else
-			logger:warn('没有解析的谷歌协议:', protoBufLabel[opCode], "opCode = ", opCode)
-		end
+	else
+		logger:warn('没有解析的谷歌协议:', self:getProtoBufLabel(opCode), "opCode = ", opCode)
 	end
 end
 
@@ -255,17 +244,17 @@ function SocketHandler:send(opCode, opName, param, isReconnetSend, protoIndex)
 		end
 	end
 	if opName then
-		opName = "PS.ProtoBuf." .. opName
+		opName = self._protoPackage .. opName
 	end
 	if self._isConnecting then
 		local stringbuffer, stringLength = nil, 0
 		if opName then
-			logger:info('发送谷歌协议:' .. opName, '协议:', protoBufLabel[opCode], 'opCode = ', opCode, 'self._protoIndex = ' .. self._protoIndex)
+			logger:info('发送谷歌协议:' .. opName, '协议:', self:getProtoBufLabel(opCode), 'opCode = ', opCode, 'self._protoIndex = ' .. self._protoIndex)
 			stringbuffer = protobuf.encode(opName, param)
 			stringLength = #stringbuffer
 			logger:info('协议长度:', stringLength)
 		else
-			logger:info('发送谷歌协议:' .. protoBufLabel[opCode], "opCode = ", opCode, 'self._protoIndex = ' .. self._protoIndex)
+			logger:info('发送谷歌协议:' .. self:getProtoBufLabel(opCode), "opCode = ", opCode, 'self._protoIndex = ' .. self._protoIndex)
 		end
 
 		-- 记录一下上下文消息，供收到错误消息时上报
@@ -439,7 +428,7 @@ end
 
 --- 获取协议号对应的协议名称字符串
 function SocketHandler:getProtoBufLabel(opCode)
-	if protoBufLabel and type(protoBufLabel)=="table" then
+	if protoBufLabel and type(protoBufLabel) == "table" then
 		return protoBufLabel[opCode]
 	end
 end

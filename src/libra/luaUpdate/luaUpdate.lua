@@ -55,7 +55,7 @@ function SocketHandler:onData(event)
 		end
 	end
 	-- 先把UI都删掉
-	libraUIManager:getUIContainer():removeAllChildren(true)
+	uiManager:getUIContainer():removeAllChildren(true)
 	-- 然后当前场景也要重载一下
 	local runningSceneName = display.getRunningScene().class.__cname
 	local modulePath = findModulePath("app%.scenes%.%a*%." .. runningSceneName)

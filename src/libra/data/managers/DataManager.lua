@@ -70,6 +70,8 @@ function DataManager:clear()
 	self._dataList = { }
 end
 
+--- 获取数据类
+-- 需要被子类重写，不同的管理类需要的数据类不同
 function DataManager:getDataType()
 	return require("libra.data.Object")
 end

@@ -8,7 +8,7 @@ local Object = class("Object")
 
 function Object:ctor()
 	-- id, type, 名字, 描述
-	self._id, self._type, self._name, self._dis = 0, 0, '', ''
+	self._id, self._type, self._name, self._des = 0, 0, '', ''
 end
 
 function Object:id(int)
