@@ -183,6 +183,8 @@ def readXls(xlsPath, xlsName):
 				sortKey = 'ID'
 				if dataList[0].has_key('Lv'):
 					sortKey = 'Lv'
+				elif dataList[0].has_key('Type'):
+					sortKey = 'Type'
 				try:
 					dataList.sort(lambda a, b : cmp(a[sortKey], b[sortKey]))
 				except Exception, e:
