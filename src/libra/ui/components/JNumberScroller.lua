@@ -13,7 +13,12 @@ function NumCol:ctor(param)
 	param = param or { }
 
 	param.text = '0'
-	self._zeroLabel = Label.new(param):addTo(self):align(display.BOTTOM_LEFT)
+	if param.outlineColor then
+		self._zeroLabel = cc.ui.UILabel.newTTFLabel_(param):addTo(self):align(display.BOTTOM_LEFT)
+		self._zeroLabel:enableOutline(param.outlineColor, 2)
+	else
+		self._zeroLabel = Label.new(param):addTo(self):align(display.BOTTOM_LEFT)
+	end
 	self._fontHeight = self._zeroLabel:getContentSize().height
 
 	local str = '9'
@@ -21,7 +26,12 @@ function NumCol:ctor(param)
 		str = str .. '\n' .. i
 	end
 	param.text = str
-	self._numsLabel = Label.new(param):addTo(self):align(display.BOTTOM_LEFT, 0, self._fontHeight)
+	if param.outlineColor then
+		self._numsLabel = cc.ui.UILabel.newTTFLabel_(param):addTo(self):align(display.BOTTOM_LEFT, 0, self._fontHeight)
+		self._numsLabel:enableOutline(param.outlineColor, 2)
+	else
+		self._numsLabel = Label.new(param):addTo(self):align(display.BOTTOM_LEFT, 0, self._fontHeight)
+	end
 
 	self._curNum = 0
 end
@@ -89,7 +99,6 @@ end
 
 --===========================================================================================
 
--- local JNumberScroller = class("JNumberScroller", require("libra.ui.components.JContainer"))
 local JNumberScroller = class("JNumberScroller", function ()
 	return cc.ClippingRegionNode:create()
 end)
@@ -97,7 +106,6 @@ end)
 function JNumberScroller:ctor(param)
 	makeUIComponent(self)
 	param = param or { }
-	-- JNumberScroller.super.ctor(self, param)
 	local length = param.length or 3
 	if length < 1 then
 		length = 1

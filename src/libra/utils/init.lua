@@ -7,6 +7,7 @@
 DATA_CONFIG_PACKAGE = DATA_CONFIG_PACKAGE or "app.config."
 
 import(".lang")
+import(".transition")
 
 local scheduler = require("framework.scheduler")
 
@@ -72,7 +73,7 @@ function sceneOnEnter(scene)
 
 	-- 添加UI层
 	local uiContainer = uiManager:getUIContainer()
-	if uiContainer:getParent() ~= nil then
+	if uiContainer:getParent() ~= scene then
 		uiContainer:removeFromParent(false)
 	end
 	uiContainer:addTo(scene, 999)
@@ -98,6 +99,10 @@ function sceneOnEnter(scene)
 end
 
 function sceneOnExit(scene)
+	local uiContainer = uiManager:getUIContainer()
+	if uiContainer:getParent() == scene then
+		uiContainer:removeFromParent(false)
+	end
 	-- 清除数据
 	ccs.ArmatureDataManager:destroyInstance()
 	-- SceneReader:sharedSceneReader():purge()
@@ -294,3 +299,28 @@ function shake(node)
 	shakeNodeY = shakeNode:y()
 	shakeHandler = scheduler.scheduleGlobal(shaking, .1)
 end
+
+--==========================================================================
+
+--字符串中每个字符后加换行符"\n", 包括其中含有中文字符
+
+function addLineBreak(obj)
+	local res = ""
+
+	print("length = " .. #obj)
+	if "string" == type(obj) then 
+		local pos = 1
+		while pos <= #obj do
+			local tmp = ""
+			if string.byte(obj,pos) > 127 then -- 判断是否是中文字符
+				tmp = string.sub(obj, pos, pos + 2)
+				pos = pos + 3
+			else
+				tmp = string.sub(obj, pos, pos)
+				pos = pos + 1
+			end
+			res = res .. tmp .. "\n" 
+		end
+	end
+	return res
+end	
