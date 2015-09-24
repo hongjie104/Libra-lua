@@ -526,7 +526,7 @@ function UpdateScene:endProcess(success)
 			for i, ver in ipairs(keyList) do
 				for _, vv in ipairs(self._fileList.updateList[ver]) do
 					if vv.act == "load" then
-						loadChunksFromZIP(self._path .. vv.name)
+						cc.LuaLoadChunksFromZIP(self._path .. vv.name)
 						print('加载zip = ' .. self._path .. vv.name)
 					end
 				end
