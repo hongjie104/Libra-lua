@@ -7,6 +7,8 @@
 local UserManager = class("UserManager")
 
 function UserManager:ctor()
+	cc(self):addComponent("components.behavior.EventProtocol"):exportMethods()
+	
 	self._account, self._password = nil, nil
 	self._gender = 1
 	self._age = 1

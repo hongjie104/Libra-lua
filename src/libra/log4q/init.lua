@@ -10,4 +10,4 @@ logger = import(".Logger").new()
 -- WARN:警告
 -- ERROR:错误
 -- FATAL:致命性错误
-LOG_LEVEL = {DEBUG = true, INFO = true, WARN = true, ERROR = true, FATAL = true}
+LOG_LEVEL = LOG_LEVEL or {DEBUG = true, INFO = true, WARN = true, ERROR = true, FATAL = true}

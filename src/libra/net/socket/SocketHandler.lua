@@ -17,7 +17,7 @@ local SocketHandler = class("SocketHandler")
 function SocketHandler:ctor()
 	self:init()
 	self._length = 0
-	self._opCodeHandler = { }
+	self._opCodeHandler = {}
 	-- 每次发送的数据量，控制数据量是为了防止pack的时候出错
 	self._sendLengthAtOnce = 4000
 
@@ -26,17 +26,8 @@ function SocketHandler:ctor()
 
 	-- 导入谷歌协议Protobuf
 	require('libra.net.socket.protobuf')
-	-- 注册协议文件，这样谷歌协议才能被解析
-	local pbPath = "res/sound/bg.mp3"
-	if device.platform == 'android' then
-		pbPath = cc.FileUtils:getInstance():fullPathForFilename('sound/bg.mp3')
-	end
-	
-	if device.platform == "windows" or cc.FileUtils:getInstance():isFileExist(pbPath) then
-		protobuf.register(cc.HelperFunc:getFileData(pbPath))
-	else
-		logger:error("找不到协议:", pbPath)
-	end
+	-- 注册协议
+	self:registerPB()
 
 	-- 网络连接是否连上了
 	self._isConnecting = false
@@ -51,8 +42,25 @@ function SocketHandler:ctor()
 
 	self._protoPackage = "PS.ProtoBuf."
 
-	self:registerOpCodeHandler(10, self.onReconnect)
-	self:registerOpCodeHandler(11, self.onCommandResult)
+	-- by zxf
+	-- self:registerOpCodeHandler(10, self.onReconnect)
+	-- self:registerOpCodeHandler(11, self.onCommandResult)
+	self:registerOpCodeHandler(10001, self.onReconnect)
+	self:registerOpCodeHandler(10002, self.onCommandResult)
+end
+
+--- 注册协议文件，这样谷歌协议才能被解析
+function SocketHandler:registerPB()
+	local pbPath = "res/sound/bg.mp3"
+	if device.platform == 'android' then
+		pbPath = cc.FileUtils:getInstance():fullPathForFilename('sound/bg.mp3')
+	end
+	
+	if device.platform == "windows" or cc.FileUtils:getInstance():isFileExist(pbPath) then
+		protobuf.register(cc.HelperFunc:getFileData(pbPath))
+	else
+		logger:error("找不到协议:", pbPath)
+	end
 end
 
 -- @private
@@ -111,6 +119,7 @@ function SocketHandler:onStartToConnect(ip, port)
 		if self._socket.isConnected then
 			-- 不是断线重连
 			self._reconnectCount = 0
+			self._isConnecting = true
 			self:sendLoginMsg()
 		else
 			self._socket:connect(ip, port)
@@ -126,6 +135,7 @@ end
 function SocketHandler:onStatus(event)
 	-- 和服务器建立连接后立马发个登录的消息
 	if event.name == SocketTCP.EVENT_CONNECTED then
+		self._isConnecting = true
 		self:sendLoginMsg()
 	elseif event.name == SocketTCP.EVENT_CONNECT_FAILURE then
 		self._isConnecting = false
@@ -150,8 +160,7 @@ function SocketHandler:onStatus(event)
 end
 
 --- 发送登录消息
-function SocketHandler:sendLoginMsg() 
-	self._isConnecting = true
+function SocketHandler:sendLoginMsg()	
 	local isVisitorStr = self._isVisitor and "True" or "False"
 	-- 发送登录消息给服务器
 	-- 登录的消息使用的是json格式的string,这是历史原因造成的,就这样吧
@@ -179,6 +188,7 @@ function SocketHandler:onData(event)
 		-- 如果当前包长等于0，说明上个包已经读完，重新获得新包的长度
 		if self._length == 0 then
 			if self._buf:getAvailable() < 8 then
+				logger:info("那啥，长度不够8，break了,长度为：", self._buf:getAvailable())
 				break
 			else
 				self._length = self._buf:readInt()
@@ -199,9 +209,15 @@ end
 
 function SocketHandler:appendData(byteString)
 	local pos = self._buf:getPos()
+	local l = self._buf:getLen()
 	self._buf:setPos(self._buf:getLen() + 1)
 	self._buf:writeBuf(byteString)
 	self._buf:setPos(pos)
+	local str = ''
+	for i = l + 1, self._buf:getLen() do
+		str = str .. string.byte(self._buf._buf[i]) .. " "
+	end
+	logger:info("收到的消息长度:", self._buf:getLen() - l, "内容:", str)
 end
 
 function SocketHandler:discardCurrentMsg(resetLength) 
@@ -221,12 +237,18 @@ function SocketHandler:discardCurrentMsg(resetLength)
 end
 
 function SocketHandler:processData()
+	local str = ''
+	for i = self._buf:getPos(), self._buf:getPos() + self._length - 1 do
+		str = str .. string.byte(self._buf._buf[i]) .. " "
+	end
+	logger:info("开始处理的消息长度:", self._length, "内容:", str)
+
 	local opCode = self._buf:readInt()
 	local msg = self._buf:readStringBytes(self._length - 4)
 	local handlerList = self._opCodeHandler[opCode]
 	if handlerList ~= nil then
 		logger:info('开始解析谷歌协议:', self:getProtoBufLabel(opCode), "opCode = ", opCode)
-		for i,v in ipairs(handlerList) do
+		for i, v in ipairs(handlerList) do
 			v(self, msg)
 		end
 	else
@@ -252,9 +274,9 @@ function SocketHandler:send(opCode, opName, param, isReconnetSend, protoIndex)
 			logger:info('发送谷歌协议:' .. opName, '协议:', self:getProtoBufLabel(opCode), 'opCode = ', opCode, 'self._protoIndex = ' .. self._protoIndex)
 			stringbuffer = protobuf.encode(opName, param)
 			stringLength = #stringbuffer
-			logger:info('协议长度:', stringLength)
+			-- logger:info('协议长度:', stringLength)
 		else
-			logger:info('发送谷歌协议:' .. self:getProtoBufLabel(opCode), "opCode = ", opCode, 'self._protoIndex = ' .. self._protoIndex)
+			logger:info('发送谷歌协议:' , self:getProtoBufLabel(opCode), "opCode = ", opCode, 'self._protoIndex = ' .. self._protoIndex)
 		end
 
 		-- 记录一下上下文消息，供收到错误消息时上报
@@ -263,8 +285,8 @@ function SocketHandler:send(opCode, opName, param, isReconnetSend, protoIndex)
 		-- self._lastSentParam = param
 
 		local ba = getBaseByteArray()
-		-- 10008是告诉服务器，发的是谷歌协议
-		ba:writeInt(10008)
+		-- 1000000是告诉服务器，发的是谷歌协议
+		ba:writeInt(1000000)
 		ba:writeInt(stringLength + 8)
 		ba:writeInt(opCode)
 		ba:writeInt(self._protoIndex)
@@ -420,8 +442,8 @@ end
 
 function SocketHandler:onCommandResult(msg)
 	if self._showLoadingHandler then scheduler.unscheduleGlobal(self._showLoadingHandler) self._showLoadingHandler = nil --[[newUIManager:closeLoading()]] end
-	local result = socket:decode("CommandResult", msg)
-	socket._msgPoolMap[result.id] = nil
+	local result = socketHandler:decode("CommandResult", msg)
+	socketHandler._msgPoolMap[result.id] = nil
 	logger:info("索引值:", result.id, '的消息已处理完毕')
 	-- self._lastCommandIndex = result.id
 end

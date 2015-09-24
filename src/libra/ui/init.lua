@@ -47,6 +47,7 @@ local function removeSelf(self)
 	if type(container.isContainer) == "function" and container:isContainer() then
 		container:removeUIComponent(self)
 	else
+		-- uiManager:removePanel(self)
 		self:removeFromParent(true)
 	end
 	return self
@@ -55,16 +56,27 @@ end
 --- 获得焦点
 local function gainFocus(self)
 	if not self._border then
-		local border = display.newScale9Sprite("ui/border.png", self:actualWidth() / 2, self:actualHeight() / 2, cc.size(self:actualWidth(), self:actualHeight()))
-		border:addTo(self)
-		self._border = border
+		if self.doGainFocus and type(self.doGainFocus) == "function" then
+			self._border = self:doGainFocus(x, y)	
+		else 
+			local border = display.newScale9Sprite("ui/border.png", self:actualWidth() / 2, self:actualHeight() / 2, cc.size(self:actualWidth(), self:actualHeight()))
+			border:addTo(self)
+			self._border = border
+		end
 	end
+
+	--local rect = self:convertToWorldSpace(cc.p(self:x(), self:y()))
+	-- uiManager:moveTVController(self:x(), self:y())
 end
 
 --- 失去焦点
 local function lostFocus(self)
-	if self._border then
-		self._border:removeSelf()
+	if self.doLostFocus and type(self.doLostFocus) == "function" then
+		self:doLostFocus()
+	else
+		if self._border then
+			self._border:removeSelf()
+		end
 		self._border = nil
 	end
 end
@@ -73,6 +85,7 @@ local function leftComponent(self, component)
 	if component then
 		if component._isuiComponent then
 			self._leftComponent = component
+			component._rightComponent = self
 		else
 			logger:error(component:name(), "is not Libra UI Component")
 		end
@@ -85,6 +98,7 @@ local function rightComponent(self, component)
 	if component then
 		if component._isuiComponent then
 			self._rightComponent = component
+			component._leftComponent = self
 		else
 			logger:error(component:name(), "is not Libra UI Component")
 		end
@@ -97,6 +111,7 @@ local function topComponent(self, component)
 	if component then
 		if component._isuiComponent then
 			self._topComponent = component
+			component._bottomComponent = self
 		else
 			logger:error(component:name(), "is not Libra UI Component")
 		end
@@ -109,6 +124,7 @@ local function bottomComponent(self, component)
 	if component then
 		if component._isuiComponent then
 			self._bottomComponent = component
+			component._topComponent = self
 		else
 			logger:error(component:name(), "is not Libra UI Component")
 		end

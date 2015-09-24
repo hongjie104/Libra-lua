@@ -34,5 +34,7 @@ KEY_EVENT = {
 	MENU_PRESSED   = "menuPressed",
 	MENU_RELEASED  = "menuReleased",
 	OK_PRESSED     = "okPressed",
-	OK_RELEASED    = "okReleased"
+	OK_RELEASED    = "okReleased",
+	BACK_PRESSED     = "backPressed",
+	BACK_RELEASED    = "backReleased"
 }

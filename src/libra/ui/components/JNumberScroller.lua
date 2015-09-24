@@ -19,7 +19,7 @@ function NumCol:ctor(param)
 	else
 		self._zeroLabel = Label.new(param):addTo(self):align(display.BOTTOM_LEFT)
 	end
-	self._fontHeight = self._zeroLabel:getContentSize().height
+	self._fontHeight = param.fontHeight or self._zeroLabel:getContentSize().height
 
 	local str = '9'
 	for i = 8, 1, -1 do

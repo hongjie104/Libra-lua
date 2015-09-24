@@ -87,4 +87,6 @@ if device.platform == "windows" then
 	end
 end
 
-require("libra.LibraIcon").new():addToContainer(nil, 99999)
+if IS_DEBUG then
+	libraIcon = require("libra.LibraIcon").new():addToContainer(nil, 99999)
+end

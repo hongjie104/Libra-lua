@@ -12,7 +12,7 @@ end
 local Label = require("libra.ui.components.JLabel")
 
 local JButton = class("JButton", function (param)
-	assert(param.normal, "JButton:class() - invalid param:param.normal is nil")
+	--assert(param.normal, "JButton:class() - invalid param:param.normal is nil")
 	if param.size then
 		return display.newNode()
 	else
@@ -29,10 +29,14 @@ function JButton:ctor(param)
 	self:setNodeEventEnabled(true)
 	cc(self):addComponent("components.behavior.EventProtocol"):exportMethods()
 
+	--zxf
 	if param.size then
+		self:actualWidth(param.size.width)
+		self:actualHeight(param.size.height)
+	elseif param.size and param.normal then
 		self._scale9Sprite = createScale9Sprite(param.normal, param.size, param.capInsets):addTo(self)
 		self:actualWidth(param.size.width)
-		self:actualHeight(param.size.Height)
+		self:actualHeight(param.size.height)
 	end
 
 	if self._param.label then
@@ -103,6 +107,7 @@ function JButton:onTouch(evt)
 		else
 			self:scale(1)
 		end
+
 		if self:isPointIn(evt.x, evt.y) then
 			self:onTouchEnded(evt)
 			self:doAction()
@@ -120,6 +125,28 @@ function JButton:updateTexture(texture)
 	end
 end
 
+function JButton:updateLabel(str)
+	if self._label then
+		self._label:setString(str)
+	end	
+end
+
+function JButton:onOkPressed()
+	if self._param.down then
+		self:updateTexture(self._param.down)
+	-- else
+	-- 	self:scale(.9)
+	end
+end
+
+function JButton:onOkReleased()
+	if self._param.down then
+		self:updateTexture(self._param.normal)
+	-- else
+	-- 	self:scale(1)
+	end
+end
+
 function JButton:onTouchBegan(evt)
 	self:dispatchEvent({name = BUTTON_EVENT.TOUCH_BEGAN, x = evt.x, y = evt.y})
 end
@@ -133,6 +160,7 @@ function JButton:onTouchEnded(evt)
 end
 
 function JButton:onCleanup()
+	self:removeAllEventListeners()
 	self:setNodeEventEnabled(false)
 end
 

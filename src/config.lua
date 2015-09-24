@@ -18,6 +18,7 @@ LOAD_SHORTCODES_API = true
 CONFIG_SCREEN_ORIENTATION = "landscape"
 
 -- design resolution
+-- CONFIG_SCREEN_WIDTH  = 960
 CONFIG_SCREEN_WIDTH  = 960
 CONFIG_SCREEN_HEIGHT = 640
 
@@ -28,4 +29,16 @@ LUA_UPDATE = false
 
 LUA_UI_EDITOR = false
 
-DATA_CONFIG_PACKAGE = "libra.data.config."
+DATA_CONFIG_PACKAGE = "app.config."
+
+UI_MANAGER_PATH = "app.view.UIManager"
+
+IS_DEBUG = true
+
+if IS_DEBUG then
+	DEBUG_FPS = true
+	LOG_LEVEL = {DEBUG = true, INFO = true, WARN = true, ERROR = true, FATAL = true}
+else
+	DEBUG_FPS = false
+	LOG_LEVEL = {DEBUG = false, INFO = false, WARN = false, ERROR = true, FATAL = true}
+end

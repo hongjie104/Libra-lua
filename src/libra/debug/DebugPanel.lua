@@ -45,9 +45,6 @@ function DebugPanel:ctor()
 				else
 					socketHandler:send(strTable[1], strTable[2], paramTable)
 				end
-
-				-- socketHandler:send(2001, "CreateCharacter", {nickName = "adsfd", gender = 1, type = 4})
-				-- print("aa")
 			end
 		end)
 
@@ -60,6 +57,17 @@ function DebugPanel:ctor()
 				socketHandler:sendJson(command, strTable)
 			end
 		end)
+end
+
+function DebugPanel:close(animation, direct)
+	DebugPanel.super.close(self, animation, direct)
+	uiManager:resetActiveContainer()
+end
+
+--- 处理返回键的逻辑，如果需要用到返回键，那么该方法的返回值必须得是true
+function DebugPanel:doBackHandler()
+	self:close()
+	return true
 end
 
 return DebugPanel

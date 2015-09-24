@@ -17,13 +17,10 @@ function JPanel:ctor(param)
 
 	if self._param.closeBtnParam then
 		self._closeBtn = Button.new(self._param.closeBtnParam):addToContainer(self):pos(self._actualWidth, self._actualHeight)
-		self._closeBtn:addEventListener(BUTTON_EVENT.CLICKED, function ()
-				uiManager:back()
-			end)
+		self._closeBtn:addEventListener(BUTTON_EVENT.CLICKED, handler(self, self.close))
 	end
 
 	self._isShowing = false
-	self:setNodeEventEnabled(true)
 end
 
 function JPanel:show(animation, container)
@@ -84,7 +81,8 @@ function JPanel:close(animation, direct)
 		if not direct and animation and type(self[animation]) == "function" then
 			self[animation](self)
 		else
-			self:removeSelf()
+			-- self:removeSelf()
+			uiManager:back()
 		end
 	end
 	return self
@@ -94,7 +92,8 @@ end
 -- @private
 function JPanel:closeFromCenter()
 	transition.scaleTo(self, {time = .2, scale = .5, easing = "BACKIN", onComplete = function ()
-		self:removeSelf()
+		-- self:removeSelf()
+		uiManager:back()
 	end})
 end
 
@@ -109,15 +108,11 @@ function JPanel:isShowing()
 	return self._isShowing
 end
 
-function JPanel:onEnter()
-	-- do nothing
-end
-
 function JPanel:onCleanup()
+	JPanel.super.onCleanup(self)
 	if self._closeBtn then
 		self._closeBtn:removeAllNodeEventListeners()
 	end
-	self:setNodeEventEnabled(false)
 end
 
 return JPanel

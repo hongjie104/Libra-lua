@@ -86,14 +86,15 @@ local JLabel = class("JLabel", function (param)
 	end
 end)
 
-function JLabel:ctor()
+function JLabel:ctor(param)
+	self._param = param
 	makeUIComponent(self)
 end
 
 function JLabel:realign(x, y)
-	if textAlign == cc.ui.TEXT_ALIGN_LEFT then
+	if self._param.align == cc.ui.TEXT_ALIGN_LEFT then
 		self:setPosition(math.round(x + self:getContentSize().width / 2), y)
-	elseif textAlign == cc.ui.TEXT_ALIGN_RIGHT then
+	elseif self._param.align == cc.ui.TEXT_ALIGN_RIGHT then
 		self:setPosition(x - math.round(self:getContentSize().width / 2), y)
 	else
 		self:setPosition(x, y)

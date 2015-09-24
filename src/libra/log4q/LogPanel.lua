@@ -30,7 +30,7 @@ function LogPanel:ctor()
 		:addToContainer(self):align(display.CENTER_LEFT, 50 + inputLabel:actualWidth(), 90)
 	self._inputField:setFontColor(display.COLOR_GREEN)
 	self._inputField:setPlaceHolder(_("{opCode [opName param] | command [key value]}"))
-	self._inputField:setText("2001 CreateCharacter nickName=abc,gender=1,type=2")
+	self._inputField:setText(localDump:get("GMCommond") or "2001 CreateCharacter nickName=abc,gender=1,type=2")
 
 	-- 发送谷歌协议的按钮
 	Button.new({normal = "ui/ty_anniu02.png", label = {text = _("Proto")}}):addToContainer(self):pos(PANEL_WIDTH - 180, 50)
@@ -42,12 +42,7 @@ function LogPanel:ctor()
 					local ary = string.split(strTable[i], ",")
 					for i,v in ipairs(ary) do
 						local keyVal = string.split(v, "=")
-						local val = checkint(keyVal[2])
-						if val == 0 then
-							paramTable[keyVal[1]] = keyVal[2]
-						else
-							paramTable[keyVal[1]] = val
-						end
+						paramTable[keyVal[1]] = unserialize(keyVal[2])
 					end
 				end
 
@@ -61,6 +56,7 @@ function LogPanel:ctor()
 
 	Button.new({normal = "ui/ty_anniu02.png", label = {text = _("Json")}}):addToContainer(self):pos(PANEL_WIDTH - 80, 50)
 		:addEventListener(BUTTON_EVENT.CLICKED, function ()
+			localDump:save("GMCommond", self._inputField:getText())
 			local strTable = string.split(self._inputField:getText(), " ")
 			if #strTable > 1 or strTable[1] ~= '' then
 				local command = strTable[1]
@@ -100,5 +96,17 @@ end
 -- 		print("async list view clicked idx:" .. event.itemPos)
 -- 	end
 -- end
+
+function LogPanel:close(animation, direct)
+	LogPanel.super.close(self, animation, direct)
+	uiManager:resetActiveContainer()
+	localDump:saveToLocal()
+end
+
+--- 处理返回键的逻辑，如果需要用到返回键，那么该方法的返回值必须得是true
+function LogPanel:doBackHandler()
+	self:close()
+	return true
+end
 
 return LogPanel

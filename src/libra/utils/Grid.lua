@@ -21,6 +21,10 @@ function Cell:addData(data)
 	self._dataList[#self._dataList + 1] = data
 end
 
+function Cell:clearData()
+	self._dataList = { }
+end
+
 function Cell:hasData(data)
 	for i, v in ipairs(self._dataList) do
 		if v == data then
@@ -64,6 +68,14 @@ function Grid:addData(data, x, y)
 				cell:addData(data)
 				return self
 			end
+		end
+	end
+end
+
+function Grid:clearData()
+	for row, colList in ipairs(self._cellList) do
+		for col, cell in ipairs(colList) do
+			cell:clearData()
 		end
 	end
 end
@@ -161,9 +173,8 @@ function Grid:getDataFrom(sourceData, direction)
 end
 
 function Grid:showGrid(container, deep)
-	-- local container = uiManager:getUIContainer()
 	local containerWidth, containerHeight = container:actualWidth(), container:actualHeight()
-	local lineBorder = {borderColor = cc.c4f(1.0, 0.0, 0.0, 1.0)}
+	local lineBorder = {borderColor = cc.c4f(1.0, 1.0, 0.0, 1.0), borderWidth = 2}
 	-- 水平或者垂直方向上的线条数量
 	local nums = deep - 1
 	-- 先画水平的线

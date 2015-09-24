@@ -8,6 +8,7 @@ DATA_CONFIG_PACKAGE = DATA_CONFIG_PACKAGE or "app.config."
 
 import(".lang")
 import(".transition")
+import(".richText")
 
 local scheduler = require("framework.scheduler")
 
@@ -82,20 +83,20 @@ function sceneOnEnter(scene)
 		import("libra.uiEditor.UIEditorContainer").new():addToContainer()
 	end
 
-	----[[
-	if device.platform == "android" then
-		-- avoid unmeant back
-		scene:performWithDelay(function()
-			-- keypad layer, for android
-			local layer = display.newNode()
-			layer:setKeypadEnabled(true)
-			layer:addNodeEventListener(cc.KEYPAD_EVENT, function (event)
-				if event.key == "back" then app.exit() end
-			end)
-			scene:addChild(layer)
-		end, 0.5)
+	if not IS_TV then
+		if device.platform == "android" then
+			-- avoid unmeant back
+			scene:performWithDelay(function()
+				-- keypad layer, for android
+				local layer = display.newNode()
+				layer:setKeypadEnabled(true)
+				layer:addNodeEventListener(cc.KEYPAD_EVENT, function (event)
+					if event.key == "back" then app.exit() end
+				end)
+				scene:addChild(layer)
+			end, 0.5)
+		end
 	end
-	--]]
 end
 
 function sceneOnExit(scene)
@@ -103,6 +104,8 @@ function sceneOnExit(scene)
 	if uiContainer:getParent() == scene then
 		uiContainer:removeFromParent(false)
 	end
+
+	-- uiManager:clearTVController()
 	-- 清除数据
 	ccs.ArmatureDataManager:destroyInstance()
 	-- SceneReader:sharedSceneReader():purge()
@@ -112,19 +115,103 @@ end
 
 function sceneOnEnterTransitionFinish(scene)
 	-- focusManager:init()
+	-- if scene.hasTVController and type(scene.hasTVController) == "function" and scene.hasTVController() then
+	-- 	uiManager:createTVController(function()
+	-- 		uiManager:getTVController():addTo(scene, 1000)
+	-- 	end)
+	-- end
+end
+
+function replaceScene(newScene, transitionType, time, more)
+	uiManager:clear()
+	display.replaceScene(newScene, transitionType, time, more)
 end
 
 --===========================================================================================
 
---- 获取带有中文的string的长度
-function getStringLength(str)
+function strToTable(str)
 	if str == "" then
-		return 0
+		return { },{ }
 	end
 	local arr  = {0, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc}
 	local strLen = #str
 	local index = strLen
 	local indexList = { }	
+	local strList = { }	
+	for i = 1, string.len(str) do
+		local tmp = string.byte(str, -index)
+		local arrLen = #arr
+		while arr[arrLen] do
+			if tmp == nil then
+				break
+			end
+			if tmp >= arr[arrLen] then
+				index = index - arrLen
+				break
+			end
+			arrLen = arrLen - 1
+		end
+		tmp = strLen - index
+		if table.indexof(indexList, tmp) == false then
+			indexList[#indexList + 1] = tmp
+			if #indexList == 1 then
+				strList[#strList + 1] = string.sub(str, 1, tmp)
+			else
+				strList[#strList + 1] = string.sub(str, indexList[#indexList - 1] + 1, indexList[#indexList])
+			end
+		end
+	end
+	return strList, indexList
+end
+
+function splitStrWith(str, splitChar)
+	local strTable, indexTable = strToTable(str)
+	local arr, count = { }, 1
+	for i, v in ipairs(strTable) do
+		if i > 1 then
+			arr[count] = splitChar
+			count = count + 1
+		end
+		arr[count] = v
+		count = count + 1
+	end
+	local str = ''
+	for i, v in ipairs(arr) do
+		str = str .. v
+	end
+	return str
+end
+
+--- 获取带有中文的string的长度
+function getStringLength(str)
+	local strTable, indexTable = strToTable(str)
+	return #indexTable
+end
+
+--- 获取自动换行的string
+-- @param str 源String
+-- @param fontName 字体名
+-- @param fontSize 字体大小
+-- @param lineWidth 一行的宽度
+-- @return 带有换行符的字符串
+function getWrapStr(str, lineWidth, fontName, fontSize)
+	lineWidth = lineWidth or 360
+	fontName = fontName or display.DEFAULT_TTF_FONT
+	fontSize = fontSize or display.DEFAULT_TTF_FONT_SIZE
+	if type(str) == "number" then
+		str = tostring(str)
+	elseif (not str) or (str == "") then
+		-- debugLayer:warn("getWrapStr 传入字符串为空")
+		return "", 0, 1, 0, FONT_SIZE, 0
+	end
+
+	local arr  = {0, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc}
+	local label = display.newTTFLabel({text = '', font = fontName, size = fontSize})
+
+	local strLen = #str
+	local index = strLen
+	local indexList = { }
+	local tmpLineWidth = lineWidth
 	for i = 1, string.len(str) do
 		local tmp = string.byte(str, -index)
 		local arrLen = #arr
@@ -143,7 +230,186 @@ function getStringLength(str)
 			indexList[#indexList + 1] = tmp
 		end
 	end
-	return #indexList
+	
+	-- 指定一个差不多的初始值 numStr（可以用指定宽度 width 除以字体大小），
+	-- 截出 0 到 numStr 位置的字符串，用 getStrWidth 计算宽度，如果比我们指定的宽度 width 大，numStr--，
+	-- 继续比较；否则 numStr++ 继续。直到 numStr 个字符宽度和我们指定宽度刚好相等（很小的概率），
+	-- 或者 numStr 个字符长度不够，但 numStr+1 长度又多了的情况下，
+	-- 可以确定这一行可以放这 numStr 个字符。然后继续处理下一行，直至字符串结束。
+	local newStr = ''
+	local numIndex = #indexList
+	-- 每一行理论上的字数
+	local numStr = checkint(lineWidth / fontSize)
+
+	-- 截取一行文字的索引值
+	local startIndex = 1
+	local endIndexInIndexList = numStr
+	if endIndexInIndexList > numIndex then
+		endIndexInIndexList = numIndex
+	end
+	local endIndex = indexList[endIndexInIndexList]
+	-- 一行文字
+	local lineStr = ''
+	local lineW, lineH = 0, 0
+	local maxLineWidth = 1
+	local minLineWidth = lineWidth + 1000
+	-- 最后一行的宽度
+	local lastLineWidth = 0
+	-- 行数
+	local lineNum = 0
+	label:setString(lineStr)
+	local size = nil
+	while endIndexInIndexList <= numIndex do
+		lineStr = string.sub(str, startIndex, endIndex)
+		label:setString(lineStr)
+		size = label:getContentSize()
+		lineW, lineH = size.width, size.height
+		if lineW > lineWidth then
+			-- 要减少一个字符，直到w <= lineWidth
+			repeat
+				endIndexInIndexList = endIndexInIndexList - 1
+				endIndex = indexList[endIndexInIndexList]
+				lineStr = string.sub(str, startIndex, endIndex)
+				label:setString(lineStr)
+				size = label:getContentSize()
+				lineW, lineH = size.width, size.height
+			until lineW <= lineWidth
+		elseif lineW < lineWidth then
+			-- 要增加一个字符，直到w >= lineWidth
+			repeat
+				endIndexInIndexList = endIndexInIndexList + 1
+				if endIndexInIndexList > numIndex then
+					break
+				end
+				endIndex = indexList[endIndexInIndexList]
+				lineStr = string.sub(str, startIndex, endIndex)
+				label:setString(lineStr)
+				size = label:getContentSize()
+				lineW, lineH = size.width, size.height
+			until lineW >= lineWidth
+			-- 刚刚超出了预设宽度，所以减去一个字符
+			endIndexInIndexList = endIndexInIndexList - 1
+			endIndex = indexList[endIndexInIndexList]
+			lineStr = string.sub(str, startIndex, endIndex)
+		end
+		if maxLineWidth < lineW then
+			maxLineWidth = lineW
+		end
+		if minLineWidth > lineW then
+			minLineWidth = lineW
+		end
+		lastLineWidth = lineW
+		-- 一行文字确定完毕
+		newStr = newStr .. lineStr .. '\n'
+		lineNum = lineNum + 1
+		-- 继续判断后面的文字
+		startIndex = endIndex + 1
+		if endIndexInIndexList >= numIndex then
+			break
+		end
+		endIndexInIndexList = endIndexInIndexList + numStr
+		if endIndexInIndexList > numIndex then
+			endIndexInIndexList = numIndex
+		end
+		endIndex = indexList[endIndexInIndexList]
+	end
+	return newStr, maxLineWidth, minLineWidth, lineNum, lineH, lastLineWidth
+end
+
+--- 截取某个宽度的string
+-- @param str 源String
+-- @param lineWidth 宽度
+-- @param fontName 字体名
+-- @param fontSize 字体大小
+-- @return 截取出的字符串
+-- @return 剩下的字符串
+function getSubStrByWidth(str, lineWidth, fontName, fontSize)
+	if str == nil or #str == 0 then 
+		return 
+	end
+
+	fontName = fontName or display.DEFAULT_TTF_FONT
+	fontSize = fontSize or display.DEFAULT_TTF_FONT_SIZE
+	local arr  = {0, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc}
+
+	local strLen = #str
+	local index = strLen
+	local indexList = { }
+	local tmpLineWidth = lineWidth
+	for i = 1, string.len(str) do
+		local tmp = string.byte(str, -index)
+		local arrLen = #arr
+		while arr[arrLen] do
+			if tmp == nil then
+				break
+			end
+			if tmp >= arr[arrLen] then
+				index = index - arrLen
+				break
+			end
+			arrLen = arrLen - 1
+		end
+		tmp = strLen - index
+		if table.indexof(indexList, tmp) == false then
+			indexList[#indexList + 1] = tmp
+		end
+	end
+
+	local wrapHelpLabel = display.newTTFLabel({text = str, font = fontName, size = fontSize})
+
+	-- 优化效率
+	-- if wrapHelpLabel:getContentSize().width <= lineWidth then
+	-- 	-- 不用截
+	-- 	return str, nil, wrapHelpLabel:getContentSize().height
+	-- else
+		local numIndex = #indexList
+		-- 理论上的字数
+		local numStr = math.floor(lineWidth / fontSize)
+		if numStr < 1 then
+			return nil, str, 0
+			-- numStr = 1
+		end
+		-- 截取一行文字的索引值
+		local startIndex = 1
+		local endIndexInIndexList = numStr
+		if endIndexInIndexList > numIndex then
+			endIndexInIndexList = numIndex
+		end
+		local endIndex = indexList[endIndexInIndexList]
+
+		-- 一行文字
+		local lineStr = string.sub(str, startIndex, endIndex)
+
+		local lineW = 1
+		wrapHelpLabel:setString(lineStr)
+		if lineW > lineWidth then
+			-- 要减少一个字符，直到w <= lineWidth
+			repeat
+				endIndexInIndexList = endIndexInIndexList - 1
+				endIndex = indexList[endIndexInIndexList]
+				lineStr = string.sub(str, startIndex, endIndex)
+				wrapHelpLabel:setString(lineStr)
+				lineW = wrapHelpLabel:getContentSize().width
+			until lineW <= lineWidth
+		elseif lineW < lineWidth then
+			-- 要增加一个字符，直到w >= lineWidth
+			repeat
+				endIndexInIndexList = endIndexInIndexList + 1
+				if endIndexInIndexList > numIndex then
+					break
+				end
+				endIndex = indexList[endIndexInIndexList]
+				lineStr = string.sub(str, startIndex, endIndex)
+				wrapHelpLabel:setString(lineStr)
+				lineW = wrapHelpLabel:getContentSize().width
+			until lineW >= lineWidth
+			-- 刚刚超出了预设宽度，所以减去一个字符
+			endIndexInIndexList = endIndexInIndexList - 1
+			endIndex = indexList[endIndexInIndexList]
+			lineStr = string.sub(str, startIndex, endIndex)
+		end
+		return lineStr, string.sub(str, endIndex + 1), wrapHelpLabel:getContentSize().height
+	-- end
 end
 
 --===========================================================================================
@@ -307,7 +573,6 @@ end
 function addLineBreak(obj)
 	local res = ""
 
-	print("length = " .. #obj)
 	if "string" == type(obj) then 
 		local pos = 1
 		while pos <= #obj do
@@ -323,4 +588,5 @@ function addLineBreak(obj)
 		end
 	end
 	return res
-end	
+end
+
